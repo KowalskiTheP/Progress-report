@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
 
 ## loading data from a CSV file in a pandas DataFrame. 
@@ -44,6 +45,13 @@ def get_windows(x,y,winLength):
     x_train.append(x[i:i+winLength])
     y_train.append(y[i+winLength-1])
   return np.array(x_train), np.array(y_train)
+
+def normalise_data(x_data, y_data):
+  scaler = MinMaxScaler(feature_range=(0,1))
+  scaler.fit(x_data)
+  x_scaled = scaler.transform(x_data)
+  y_scaled = scaler.transform(y_data)
+  return x_scaled, y_scaled
   
 
 ## Following lines were used to test the functions  
