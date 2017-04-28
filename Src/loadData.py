@@ -2,40 +2,58 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-dax_df=pd.read_csv('../Data/dax_19700103_20170412.csv', sep=';', header=0)
+## loading data from a CSV file in a pandas DataFrame. 
+## The diff between the values in dateColumn and the refdate gets also calculated and added.
+## If no date is aviable, dataColumn has to be 'None'
+def load_fromCSV(csvFile, decimal , seperator, header, dateColumn):
+  df=pd.read_csv(csvFile, decimal=decimal ,sep=seperator, header=header)
+  if dateColumn != 'None':
+    ## Some definitions and initialisation
+    refdate = '01.01.1900'
+    date_format = "%d.%m.%Y"
+    date_list = []
+    b = datetime.strptime(refdate, date_format)
+    ## Getting the diff between ref and data date
+    for i in range(len(df)):
+      a = datetime.strptime(df.loc[i,dateColumn], date_format)
+      date_list.append(a-b)
+    df['days'] = date_list   
+  return df
 
-# Some definitions and initialisation
-trainData = np.zeros((len(dax_df), 3))
-refdate = '01.01.1900'
-date_format = "%d.%m.%Y"
-b = datetime.strptime(refdate, date_format)
+## Creating a numpy array with all data from the selected columns 
+## of the previosly initialised dataFrame
+def getDataSet(dataframe, columns):
+  dataSet = np.zeros((len(dataframe), len(columns)))
+  for i in range(len(columns)):
+    dataSet[:,i] = dataframe.iloc[:,columns[i]]
+  return dataSet
 
-for i in range(len(dax_df)):
-# The next 7 lines are needed to convert the date format in "%d.%m.%Y". 
-# If the data already has this format nothing should happen.
-  d=dax_df['Datum'][i].split('.')[0]
-  m=dax_df['Datum'][i].split('.')[1]
-  y=dax_df['Datum'][i].split('.')[2]
-  if int(y)>17 and int(y)<1000:
-    y=str(int(y)+1900)
-  else:
-    y=str(int(y)+2000)
-  origDate = str(d+'.'+m+'.'+y)
-  a = datetime.strptime(origDate, date_format)
-  trainData[i,0] = int(str(a-b).split(' ')[0])
+## Shifting the data by look_back to create usefull x and y arrays
+def shiftData(data, look_back):
+  x = np.zeros((len(data)-look_back,data.shape[1]))
+  y = np.zeros((len(data)-look_back,1))
+  for i in range(len(data)-look_back):
+    x[i] = data[i]
+    y[i] = data[i+1]
+  return x, y
+
+## The single windows will be the samples for the model
+def get_windows(x,y,winLength):
+  x_train, y_train = [], []
+  for i in range(len(x)-(winLength+1)):
+    x_train.append(x[i:i+winLength])
+    y_train.append(y[i+winLength-1])
+  return np.array(x_train), np.array(y_train)
   
-# The original data had commas as decimal signs. With sed all commas were replaced with points. 
-# Now there are numbers like 1.000.54 which are catched by the following 'try' statemants.  
-  try:
-    trainData[i][1] = float(dax_df['Eroeffnung'][i])
-  except:
-    tmpEroeffnung = str(dax_df['Eroeffnung'][i]).split('.')
-    trainData[i][1] = float(str(tmpEroeffnung[0]+tmpEroeffnung[1]+'.'+tmpEroeffnung[2]))   
-  try:
-    trainData[i][2] = float(dax_df['Schluss'][i])
-  except:
-    tmpSchluss = str(dax_df['Schluss'][i]).split('.')
-    trainData[i][2] = float(str(tmpSchluss[0]+tmpSchluss[1]+'.'+tmpSchluss[2]))
 
+## Following lines were used to test the functions  
 
-print trainData
+#dataframe = load_fromCSV('../Data/dax_19700105_20170428.csv', ',', ';', 0,'Datum')
+#print dataframe
+#dataSet = getDataSet(dataframe, [4])
+#x_full, y_full = shiftData(dataSet, 1)
+#x_win, y_win = get_windows(x_full,y_full,10)
+
+#print 'x: ',x_win[-3:-1]
+#print 'y: ',y_win[-3:-1]
+
