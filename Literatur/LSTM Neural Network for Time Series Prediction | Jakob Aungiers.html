@@ -1,0 +1,796 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<!-- jQuery -->
+	<script src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/analytics.js" async=""></script><script src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/jquery.js"></script>
+	<link rel="stylesheet" href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/jquery-ui.css">
+	<script src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/jquery-ui.js"></script>
+
+	<!-- Bootstrap -->
+	<script src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/bootstrap.js"></script>
+	<link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/bootstrap.css" rel="stylesheet">
+
+	<link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/site.css" rel="stylesheet" type="text/css">
+	
+	<link rel="shortcut icon" href="http://www.jakob-aungiers.com/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="http://www.jakob-aungiers.com/favicon.ico" type="image/x-icon">
+
+	<title>LSTM Neural Network for Time Series Prediction | Jakob Aungiers</title>
+    <meta property="og:type" content="article">
+						  <meta property="og:title" content="LSTM Neural Network for Time Series Prediction">
+						  <meta property="og:description" content="Whilst there are plenty of articles detailing the theoretical workings of neural networks for deep learning applications, I" m="" giving="" this="" one="" from="" a="" purely="" practical="" point="" of="" view="" on="" how="" to="" use="" lstm="" networks="" for="" time="" series="" prediction="" using="" keras="" python'="">
+						  <meta property="og:image" content="http://www.jakob-aungiers.com/img/article/lstm-neural-network-timeseries.jpg"><script data-timestamp="1492782458101" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/embed.js"></script><link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a_data_002/lounge.css" rel="prefetch"><link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a_data_002/common.js" rel="prefetch"><link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a_data_002/lounge.js" rel="prefetch"><link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a_data_002/config.js" rel="prefetch"></head> 
+
+<body>
+<div class="container-fluid">
+	<div class="row" id="nav">
+		<ul>
+			<li><a href="http://www.jakob-aungiers.com/">About</a></li>
+			<li><a href="http://www.jakob-aungiers.com/articles">Articles</a></li>
+			<li><a href="http://www.jakob-aungiers.com/docs/CV-Jakob%20Aungiers.pdf" onclick='trackDownloadClick("CV-Jakob Aungiers")'>CV</a></li>
+			<li><a href="http://www.jakob-aungiers.com/contact">Contact</a></li>
+		</ul>
+	</div>
+	
+	<link rel="stylesheet" href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/atom-one-dark.css">
+<script src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+    
+<link href="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/articles.css" rel="stylesheet" type="text/css">
+
+<div class="row" id="container">
+	<div id="side-nav">
+		<img id="logo" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/JA-logo.png">
+        
+        		
+        <a href="http://www.jakob-aungiers.com/articles/a/Installing-TensorFlow-GPU-Natively-on-Windows-10">
+		<div class="article-link">
+			<div class="title">
+				<div class="date">
+                27                <br>
+                Feb					<span class="year">2017</span>
+				</div>
+				<div class="title-text">
+					Installing TensorFlow GPU Natively on Windows 10				</div>
+			</div>
+		</div>
+        </a>
+        
+        		
+        <a href="http://www.jakob-aungiers.com/articles/a/LSTM-Neural-Network-for-Time-Series-Prediction">
+		<div class="article-link">
+			<div class="title">
+				<div class="date">
+                21                <br>
+                Dec					<span class="year">2016</span>
+				</div>
+				<div class="title-text">
+					LSTM Neural Network for Time Series Prediction				</div>
+			</div>
+		</div>
+        </a>
+        
+        		
+        <a href="http://www.jakob-aungiers.com/articles/a/The-Disruption-of-Traditional-Asset-Management">
+		<div class="article-link">
+			<div class="title">
+				<div class="date">
+                12                <br>
+                Nov					<span class="year">2016</span>
+				</div>
+				<div class="title-text">
+					The Disruption of Traditional Asset Management				</div>
+			</div>
+		</div>
+        </a>
+        
+        		
+        <a href="http://www.jakob-aungiers.com/articles/a/Optimisation-of-Matched-Betting-Choosing-the-Best-Bet">
+		<div class="article-link">
+			<div class="title">
+				<div class="date">
+                05                <br>
+                Nov					<span class="year">2016</span>
+				</div>
+				<div class="title-text">
+					Optimisation of Matched Betting Choosing the Best Bet				</div>
+			</div>
+		</div>
+        </a>
+        
+        		
+        <a href="http://www.jakob-aungiers.com/articles/a/GoPro-Omni-360-VR-Skydiving-Showcase">
+		<div class="article-link">
+			<div class="title">
+				<div class="date">
+                31                <br>
+                Oct					<span class="year">2016</span>
+				</div>
+				<div class="title-text">
+					GoPro Omni 360 VR Skydiving Showcase				</div>
+			</div>
+		</div>
+        </a>
+        
+        
+	</div>
+    
+        <div class="row" id="body-container">
+		<div class="col-lg-1"></div>
+		<div class="col-lg-10" id="article-container">
+
+			<div id="header-img" class="bg-cover" style="background-image: url('/img/article/lstm-neural-network-timeseries.jpg');"></div>
+			<div id="article-title">
+				<h1>LSTM Neural Network for Time Series Prediction</h1>
+				<div class="date">Wed 21st Dec 2016</div>
+			</div>
+
+			<hr>
+
+		 	<div id="main-text">
+	            <p>Neural Networks these days are the “go to” thing when 
+talking about new fads in machine learning. As such, there’s a plethora 
+of courses and tutorials out there on the basic vanilla neural nets, 
+from simple tutorials to complex articles describing their workings in 
+depth.</p>
+
+<p>For deeper networks the obsession with image classification tasks 
+seems to have also caused tutorials to appear on the more complex 
+convolutional neural networks. This is great, if you’re into that sort 
+of thing, for me however I’m not particularly enthused by classifying 
+images. I am far more interested in data with timeframes. And this is 
+where recurrent neural networks (RNNs) come in rather handy (and I’m 
+guessing that by reading this article you’ll know that long short term 
+memory, LSTM, networks are the most popular and useful variants of RNNs.
+ If not, there’s <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank">lots</a> of <a href="https://www.youtube.com/watch?v=_aCuOwF1ZjU&amp;t=251s" target="_blank">useful</a> <a href="https://blog.terminal.com/demistifying-long-short-term-memory-lstm-recurrent-neural-networks/" target="_blank">articles</a> describing LSTMs out there you should probably check out first).</p>
+
+<p>Now whilst there’s lots of public research papers and articles on 
+LSTMs, what I’ve found is that pretty much all of these deal with the 
+theoretical workings and maths behind them and the examples they give 
+don’t really show predictive look-ahead powers of LSTMs in terms of a 
+time series. Again, all great if you’re looking to know the intricate 
+workings of LSTMs but not ideal if you just want to get something up and
+ running.</p>
+
+<p>What I’ll be doing here then is giving a full meaty code tutorial on 
+the use of LSTMs to forecast some time series using the Keras package 
+for Python [2.7].</p>
+
+<p>Friendly Warning: If you’re looking for an article which deals in how
+ LSTMs work from a mathematical and theoretic perspective then I’m going
+ to be disappointing you worse than I disappointed the last girl I 
+dated. If however you’re looking for an article with practical coding 
+examples that work, keep reading…</p>
+
+<p>Note: The full code for this project can be found on the topics <a href="https://github.com/jaungiers/LSTM-Neural-Network-for-Time-Series-Prediction" target="_blank">GitHub page</a>.</p>
+
+<p>&nbsp;</p>
+
+<h2><strong>A Simple Sin Wave</strong></h2>
+
+<p>Let’s start with the most basic thing we can think of that’s a time 
+series; your bog standard sin wave function. And let’s create the data 
+we’ll need to model many oscillations of this function for the LSTM 
+network to train over. I made an excel spreadsheet to make a sin wave 
+with amplitude and frequency of 1 (giving an angular frequency of 6.28) 
+and I used the function to get data points over 5001 time periods with a
+ time delta of 0.01. The result (in case you’ve never seen a series of 
+sin waves in your life) looks like this.</p>
+
+<h1 style="text-align:center"><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/sindata.png" style="height:350px; width:657px"></h1>
+
+<p style="text-align:center"><strong><em>The full sin wave dataset visualized: 5001 time periods </em></strong></p>
+
+<p>&nbsp;</p>
+
+<p>To save you the trouble of making this yourself I’ve kindly put the 
+data for this very series into a CSV that I’ll be using as the 
+training/testing file <a href="https://raw.githubusercontent.com/jaungiers/LSTM-Neural-Network-for-Time-Series-Prediction/master/sinwave.csv" target="_blank">Here</a>.</p>
+
+<p>Now that we have the data, what are we actually trying to achieve? 
+Well that’s simple we want the LSTM to learn the sin wave from a set 
+window size of data that we will feed it and then hopefully we can ask 
+the LSTM to predict the next N-steps in the series and it will keep 
+spitting out the sin wave.</p>
+
+<p>We’ll start by transforming and loading the data from the CSV file to
+ the numpy array that will feed the LSTM. The way Keras LSTM layers work
+ is by taking in a numpy array of 3 dimensions (N, W, F) where N is the 
+number of training sequences, W is the sequence length and F is the 
+number of features of each sequence. I chose to go with a sequence 
+length (read window size) of 50 which allows for the network so get 
+glimpses of the shape of the sin wave at each sequence and hence will 
+hopefully teach itself to build up a pattern of the sequences based on 
+the prior window received. The sequences themselves are sliding windows 
+and hence shift by 1 each time, causing a constant overlap with the 
+prior windows.</p>
+
+<p style="text-align:center"><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/sinwindow.png" style="height:300px; width:553px"><br>
+<strong><em>An example of a sequence of length 50</em></strong></p>
+
+<p>Here’s the code to load the training data CSV into the appropriately shaped numpy array:</p>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_data</span><span class="hljs-params">(filename, seq_len, normalise_window)</span>:</span>
+    f = open(filename, <span class="hljs-string">'rb'</span>).read()
+    data = f.decode().split(<span class="hljs-string">'\n'</span>)
+
+    sequence_length = seq_len + <span class="hljs-number">1</span>
+    result = []
+    <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> range(len(data) - sequence_length):
+        result.append(data[index: index + sequence_length])
+
+    result = np.array(result)
+
+    row = round(<span class="hljs-number">0.9</span> * result.shape[<span class="hljs-number">0</span>])
+    train = result[:int(row), :]
+    np.random.shuffle(train)
+    x_train = train[:, :<span class="hljs-number">-1</span>]
+    y_train = train[:, <span class="hljs-number">-1</span>]
+    x_test = result[int(row):, :<span class="hljs-number">-1</span>]
+    y_test = result[int(row):, <span class="hljs-number">-1</span>]
+
+    x_train = np.reshape(x_train, (x_train.shape[<span class="hljs-number">0</span>], x_train.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))
+    x_test = np.reshape(x_test, (x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))  
+
+    <span class="hljs-keyword">return</span> [x_train, y_train, x_test, y_test]
+</code>
+</pre>
+
+<p>&nbsp;</p>
+
+<p>Next up we need to actually build the network itself. This is the 
+simple part! At least if you’re using Keras it’s as simple as stacking 
+Lego bricks. I used a network structure of [1, 50, 100, 1] where we have
+ 1 input layer (consisting of a sequence of size 50) which feeds into an
+ LSTM layer with 50 neurons, that in turn feeds into another LSTM layer 
+with 100 neurons which then feeds into a fully connected normal layer of
+ 1 neuron with a linear activation function which will be used to give 
+the prediction of the next time step.</p>
+
+<p>Here’s the code for the model build functions:</p>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">build_model</span><span class="hljs-params">(layers)</span>:</span>
+    model = Sequential()
+
+    model.add(LSTM(
+        input_dim=layers[<span class="hljs-number">0</span>],
+        output_dim=layers[<span class="hljs-number">1</span>],
+        return_sequences=<span class="hljs-keyword">True</span>))
+    model.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    model.add(LSTM(
+        layers[<span class="hljs-number">2</span>],
+        return_sequences=<span class="hljs-keyword">False</span>))
+    model.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    model.add(Dense(
+        output_dim=layers[<span class="hljs-number">3</span>]))
+    model.add(Activation(<span class="hljs-string">"linear"</span>))
+
+    start = time.time()
+    model.compile(loss=<span class="hljs-string">"mse"</span>, optimizer=<span class="hljs-string">"rmsprop"</span>)
+    print(<span class="hljs-string">"&gt; Compilation Time : "</span>, time.time() - start)
+    <span class="hljs-keyword">return</span> model
+</code>
+</pre>
+
+<p>&nbsp;</p>
+
+<p>Finally it’s time to train the network on the data and see what we 
+get. I used only 1 training epoch with this LSTM, which unlike 
+traditional networks where you need lots of epochs for the network to be
+ trained on lots of training examples, with this 1 epoch an LSTM will 
+cycle through all the sequence windows in the training set once. If this
+ data had less structure to it, a large number of epochs would be 
+required, but as this is a sin wave with a predictable pattern that maps
+ onto a simple function 1 training epoch will be good enough to get a 
+very good approximation of the full sin function.</p>
+
+<p>We put all this run code into a seperate run.py module and run it like such:</p>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs">epochs  = <span class="hljs-number">1</span>
+seq_len = <span class="hljs-number">50</span>
+
+print(<span class="hljs-string">'&gt; Loading data... '</span>)
+
+X_train, y_train, X_test, y_test = lstm.load_data(<span class="hljs-string">'sp500.csv'</span>, seq_len, <span class="hljs-keyword">True</span>)
+
+print(<span class="hljs-string">'&gt; Data Loaded. Compiling...'</span>)
+
+model = lstm.build_model([<span class="hljs-number">1</span>, <span class="hljs-number">50</span>, <span class="hljs-number">100</span>, <span class="hljs-number">1</span>])
+
+model.fit(
+    X_train,
+    y_train,
+    batch_size=<span class="hljs-number">512</span>,
+    nb_epoch=epochs,
+    validation_split=<span class="hljs-number">0.05</span>)
+
+predicted = lstm.predict_point_by_point(model, X_test)
+</code>
+</pre>
+
+<p>&nbsp;</p>
+
+<p>If you’re observant you’ll have noticed in our load_data() function 
+above we split the data in to train/test sets as is standard practice 
+for machine learning problems. However what we need to watch out for 
+here is what we actually want to achieve in the prediction of the time 
+series.</p>
+
+<p>If we were to use the test set as it is, we would be running each 
+window full of the true data to predict the next time step. This is fine
+ if we are only looking to predict one time step ahead, however if we’re
+ looking to predict more than one time step ahead, maybe looking to 
+predict any emergent trends or functions (e.g. the sin function in this 
+case) using the full test set would mean we would be predicting the next
+ time step but then disregarding that prediction when it comes to 
+subsequent time steps and using only the true data for each time step.</p>
+
+<p>You can see below the graph of using this approach to predict only one time step ahead at each step in time:</p>
+
+<p style="text-align:center"><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/sinpointprediction.png" style="height:400px; width:624px"><br>
+<em><strong>epochs = 1, window size = 50</strong></em></p>
+
+<p>If however we want to do real magic and predict many time steps ahead
+ we only use the first window from the testing data as an initiation 
+window. At each time step we then pop the oldest entry out of the rear 
+of the window and append the prediction for the next time step to the 
+front of the window, in essence shifting the window along so it slowly 
+builds itself with predictions, until the window is full of only 
+predicted values (in our case, as our window is of size 50 this would 
+occur after 50 time steps). We then keep this up indefinitely, 
+predicting the next time step on the predictions of the previous future 
+time steps, to hopefully see an emerging trend.</p>
+
+<p>The graph below shows the sin wave time series being predicted from 
+only an initial start window of true test data and then being predicted 
+for ~500 steps:</p>
+
+<p style="text-align:center"><strong><em><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/sinseqprediction.png" style="height:400px; width:696px"><br>
+epochs = 1, window size = 50</em></strong></p>
+
+<p>Overlaid with the true data we can see that with just 1 epoch and a 
+reasonably small training set of data the LSTM has already done a pretty
+ damn good job of predicting the sin function. You can see that as we 
+predict more and more into the future the error margin increases as 
+errors in the prior predictions are amplified more and more when they 
+are used for future predictions. As such we see that the LSTM hasn’t got
+ the frequency quite right and it drifts the more we try to predict it. 
+However as the sin function is a very easy oscillating function with 
+zero noise it can predict it to a good degree.</p>
+
+<p>Next we will try to see what happens when we try to predict the data 
+on much more stochastic real world data (not saying a sin wave isn’t in 
+the real world. I mean after all, what is the real world when we can 
+make real data for a sin wave and predict on it... I digress…).</p>
+
+<p>&nbsp;</p>
+
+<h2><strong>A Not-So-Simple Stock Market</strong></h2>
+
+<p>We predicted a several hundred time steps of a sin wave on an 
+accurate point-by-point basis. So we can now just do the same on a stock
+ market time series and make a shit load of money right?</p>
+
+<p>Well, no.</p>
+
+<p style="text-align:center"><em><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/gtfomyboat.png" style="height:210px; width:500px"><br>
+<strong>“Nobody knows if a stock is gonna go up, down, sideways or in fucking circles” - Mark Hanna</strong></em></p>
+
+<p>&nbsp;</p>
+
+<p>A stock time series is unfortunately not a function that can be 
+mapped. It can best described more as a random walk, which makes the 
+whole prediction thing considerably harder. But what about the LSTM 
+identifying any underlying hidden trends? Well, let’s take a look.</p>
+
+<p><a href="https://raw.githubusercontent.com/jaungiers/LSTM-Neural-Network-for-Time-Series-Prediction/master/sp500.csv" target="_blank">Here</a>
+ is a CSV file where I have taken the adjusted daily closing price of 
+the S&amp;P 500 equity index from January 2000 – August 2016. I’ve 
+stripped out everything to make it in the exact same format as our sin 
+wave data and we will now run it through the same model we used on the 
+sin wave with the same train/test split.</p>
+
+<p>There is one slight change we need to make to our data however, 
+because a sin wave is already a nicely normalized repeating pattern it 
+works well running the raw data points through the network. However 
+running the adjusted returns of a stock index through a network would 
+make the optimization process shit itself and not converge to any sort 
+of optimums for such large numbers. So to combat this we will take each 
+n-sized window of training/testing data and normalize each one to 
+reflect percentage changes from the start of that window (so the data at
+ point i=0 will always be 0). We’ll use the following equations to 
+normalise and subsequently de-normalise at the end of the prediction 
+process to get a real world number out of the prediction:</p>
+
+<p><br>
+n = normalised list [window] of price changes<br>
+p = raw list [window] of adjusted daily return prices</p>
+
+<h3><strong>Normalisation:</strong></h3>
+
+<p><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/svg_002.svg" style="height:37px; width:111px"></p>
+
+<h3><strong>De-Normalisation:</strong></h3>
+
+<p><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/svg.svg" style="height:18px; width:114px"></p>
+
+<p><br>
+We added a <strong><em>normalise_windows(window_data)</em></strong> 
+function to our code and updated our load_data(filename) function to 
+include a conditional call and take the sequence length and normalise 
+flag <strong><em>load_data(filename, seq_len, normalise_window):</em></strong></p>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_data</span><span class="hljs-params">(filename, seq_len, normalise_window)</span>:</span>
+    f = open(filename, <span class="hljs-string">'rb'</span>).read()
+    data = f.decode().split(<span class="hljs-string">'\n'</span>)
+
+    sequence_length = seq_len + <span class="hljs-number">1</span>
+    result = []
+    <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> range(len(data) - sequence_length):
+        result.append(data[index: index + sequence_length])
+    
+    <span class="hljs-keyword">if</span> normalise_window:
+        result = normalise_windows(result)
+
+    result = np.array(result)
+
+    row = round(<span class="hljs-number">0.9</span> * result.shape[<span class="hljs-number">0</span>])
+    train = result[:int(row), :]
+    np.random.shuffle(train)
+    x_train = train[:, :<span class="hljs-number">-1</span>]
+    y_train = train[:, <span class="hljs-number">-1</span>]
+    x_test = result[int(row):, :<span class="hljs-number">-1</span>]
+    y_test = result[int(row):, <span class="hljs-number">-1</span>]
+
+    x_train = np.reshape(x_train, (x_train.shape[<span class="hljs-number">0</span>], x_train.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))
+    x_test = np.reshape(x_test, (x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))  
+
+    <span class="hljs-keyword">return</span> [x_train, y_train, x_test, y_test]
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">normalise_windows</span><span class="hljs-params">(window_data)</span>:</span>
+    normalised_data = []
+    <span class="hljs-keyword">for</span> window <span class="hljs-keyword">in</span> window_data:
+        normalised_window = [((float(p) / float(window[<span class="hljs-number">0</span>])) - <span class="hljs-number">1</span>) <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> window]
+        normalised_data.append(normalised_window)
+    <span class="hljs-keyword">return</span> normalised_data
+</code>
+</pre>
+
+<p>&nbsp;</p>
+
+<p>This now normalised the windows as mentioned above and hence we can 
+now run our stock data through our LSTM network. Let’s see how it does:</p>
+
+<p style="text-align:center"><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/stockpointprediction.png" style="height:400px; width:688px"><br>
+<strong><em>epochs = 50, window size = 50</em></strong></p>
+
+<p>Running the data on a single point-by-point prediction as mentioned 
+above gives something that matches the returns pretty closely. But this 
+is deceptive! Why? Well if you look more closely, the prediction line is
+ made up of singular prediction points that have had the whole prior 
+true history window behind them. Because of that, the network doesn’t 
+need to know much about the time series itself other than that each next
+ point most likely won’t be too far from the last point. So even if it 
+gets the prediction for the point wrong, the next prediction will then 
+factor in the true history and disregard the incorrect prediction, yet 
+again allowing for an error to be made.</p>
+
+<p>We can’t see what is happening in the brain of the LSTM, but I would 
+make a strong case that for this prediction of what is essentially a 
+random walk (and as a matter of point, I have made a completely random 
+walk of data that mimics the look of a stock index, and the exact same 
+thing holds true there as well!) is “predicting” the next point with 
+essentially a Gaussian distribution, allowing the essentially random 
+prediction to not stray too wildly from the true data.</p>
+
+<p>So what would we look at if we wanted to see whether there truly was 
+some underlying pattern discernable in just the price movements? Well we
+ would do the same as for the sin wave problem and let the network 
+predict a sequence of points rather than just the next one.</p>
+
+<p>Doing that we can now see that unlike the sin wave which carried on 
+as a sin wave sequence that was almost identical to the true data, our 
+stock data predictions converge very quickly into some sort of 
+equilibrium.</p>
+
+<p style="text-align:center"><strong><em><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/stockseqprediction50e.png" style="height:400px; width:708px"><br>
+epochs = 50, window size = 50</em></strong></p>
+
+<p style="text-align:center">&nbsp;</p>
+
+<p style="text-align:center"><strong><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/stockseqprediction1e.png" style="height:400px; width:662px"></strong><br>
+<strong><em>epochs = 1, window size = 50</em></strong></p>
+
+<p>&nbsp;</p>
+
+<p>Looking at the equilibrium for the two training examples we’ve run 
+(one with 1 epoch and one with 50 epochs) we can see there’s wild 
+differences between the two. This wild difference seems to be orthogonal
+ to what you might expect; usually a higher epoch would mean a more 
+accurate model, however in this case it almost looks as if the single 
+epoch model is tending towards some sort of reversion that generally 
+follows the short time price movement.</p>
+
+<p>Let’s investigate this further by limiting our prediction sequence to
+ 50 future time steps and then shifting the initiation window by 50 each
+ time, in effect creating many independent sequence predictions of 50 
+time steps:</p>
+
+<p style="text-align:center"><strong><em><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/stockmultseqprediction.png" style="height:380px; width:734px"><br>
+epochs = 1, window size = 50, sequence shift = 50</em></strong></p>
+
+<p>I’m going to be honest here and say that the result in the graph 
+above has surprised me slightly. I was expecting to be able to 
+demonstrate that it would be a fools game to try to predict future price
+ movements from purely historical price movements on a stock index (due 
+to the fact that there are so many underlying factors that influence 
+daily price fluctuations; from fundamental factors of the underlying 
+companies, macro events, investor sentiment and market noise…) however 
+checking the predictions of the very limited test above we can see that 
+for a lot of movements, especially the large ones, there seems to be 
+quite the consensus of the model predictions and the subsequent price 
+movement.</p>
+
+<p>I’m going to put a big fucking warning sign right here however! There
+ are many, MANY reasons why the above “promising looking” graph could be
+ wrong. Sampling errors, pure luck in a small sample size… nothing in 
+this graph should be taken at face value and blindly followed into a 
+money sucking pit without some thorough and extensive series of 
+backtests (which are out of scope for this article). You’ve been warned.</p>
+
+<p style="text-align: center;"><img alt="" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/stockmultiplee400.png" style="height:400px; width:675px"><br>
+<strong><em>epochs = 400, window size = 50, sequence shift = 50</em></strong></p>
+
+<p>In fact when we take a look at the graph above of the same run but 
+with the epochs increased to 400 (which should make the model mode 
+accurate) we see that actually it now just tries is predict an upwards 
+momentum for almost every time period!</p>
+
+<p>However, with that I hope all you eager young chaps have learnt the 
+basics of what makes LSTM networks tick and how they can be used to 
+predict and map a time series, as well as the potential pitfalls of 
+doing so!</p>
+
+<p>LSTM uses are currently rich in the world of text prediction, AI chat
+ apps, self-driving cars…and many other areas. Hopefully this article 
+has expanded on the practical applications of using LSTMs in a time 
+series approach and you’ve found it useful.</p>
+
+<p>For completeness, below is the full project code which you can also find on the <a href="https://github.com/jaungiers/LSTM-Neural-Network-for-Time-Series-Prediction" target="_blank">GitHub page</a>:</p>
+
+<p>And for reference, the machine I use to run my neural network models is the <a href="http://www.gearbest.com/laptops/pp_421980.html?lkid=10545137" target="_blank">Xiaomi Mi Notebook Air 13</a>
+ which I highly recommend as it has a built-in Nvidia GeForce 940MX 
+graphics card which can be used with Tensorflow GPU version to speed up 
+concurrent models like an LSTM.
+
+</p><h3><strong>lstm.py file</strong></h3>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> warnings
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> numpy <span class="hljs-keyword">import</span> newaxis
+<span class="hljs-keyword">from</span> keras.layers.core <span class="hljs-keyword">import</span> Dense, Activation, Dropout
+<span class="hljs-keyword">from</span> keras.layers.recurrent <span class="hljs-keyword">import</span> LSTM
+<span class="hljs-keyword">from</span> keras.models <span class="hljs-keyword">import</span> Sequential
+
+os.environ[<span class="hljs-string">'TF_CPP_MIN_LOG_LEVEL'</span>] = <span class="hljs-string">'3'</span> <span class="hljs-comment">#Hide messy TensorFlow warnings</span>
+warnings.filterwarnings(<span class="hljs-string">"ignore"</span>) <span class="hljs-comment">#Hide messy Numpy warnings</span>
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load_data</span><span class="hljs-params">(filename, seq_len, normalise_window)</span>:</span>
+    f = open(filename, <span class="hljs-string">'rb'</span>).read()
+    data = f.decode().split(<span class="hljs-string">'\n'</span>)
+
+    sequence_length = seq_len + <span class="hljs-number">1</span>
+    result = []
+    <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> range(len(data) - sequence_length):
+        result.append(data[index: index + sequence_length])
+    
+    <span class="hljs-keyword">if</span> normalise_window:
+        result = normalise_windows(result)
+
+    result = np.array(result)
+
+    row = round(<span class="hljs-number">0.9</span> * result.shape[<span class="hljs-number">0</span>])
+    train = result[:int(row), :]
+    np.random.shuffle(train)
+    x_train = train[:, :<span class="hljs-number">-1</span>]
+    y_train = train[:, <span class="hljs-number">-1</span>]
+    x_test = result[int(row):, :<span class="hljs-number">-1</span>]
+    y_test = result[int(row):, <span class="hljs-number">-1</span>]
+
+    x_train = np.reshape(x_train, (x_train.shape[<span class="hljs-number">0</span>], x_train.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))
+    x_test = np.reshape(x_test, (x_test.shape[<span class="hljs-number">0</span>], x_test.shape[<span class="hljs-number">1</span>], <span class="hljs-number">1</span>))  
+
+    <span class="hljs-keyword">return</span> [x_train, y_train, x_test, y_test]
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">normalise_windows</span><span class="hljs-params">(window_data)</span>:</span>
+    normalised_data = []
+    <span class="hljs-keyword">for</span> window <span class="hljs-keyword">in</span> window_data:
+        normalised_window = [((float(p) / float(window[<span class="hljs-number">0</span>])) - <span class="hljs-number">1</span>) <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> window]
+        normalised_data.append(normalised_window)
+    <span class="hljs-keyword">return</span> normalised_data
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">build_model</span><span class="hljs-params">(layers)</span>:</span>
+    model = Sequential()
+
+    model.add(LSTM(
+        input_dim=layers[<span class="hljs-number">0</span>],
+        output_dim=layers[<span class="hljs-number">1</span>],
+        return_sequences=<span class="hljs-keyword">True</span>))
+    model.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    model.add(LSTM(
+        layers[<span class="hljs-number">2</span>],
+        return_sequences=<span class="hljs-keyword">False</span>))
+    model.add(Dropout(<span class="hljs-number">0.2</span>))
+
+    model.add(Dense(
+        output_dim=layers[<span class="hljs-number">3</span>]))
+    model.add(Activation(<span class="hljs-string">"linear"</span>))
+
+    start = time.time()
+    model.compile(loss=<span class="hljs-string">"mse"</span>, optimizer=<span class="hljs-string">"rmsprop"</span>)
+    print(<span class="hljs-string">"&gt; Compilation Time : "</span>, time.time() - start)
+    <span class="hljs-keyword">return</span> model
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict_point_by_point</span><span class="hljs-params">(model, data)</span>:</span>
+    <span class="hljs-comment">#Predict each timestep given the last sequence of true data, in effect only predicting 1 step ahead each time</span>
+    predicted = model.predict(data)
+    predicted = np.reshape(predicted, (predicted.size,))
+    <span class="hljs-keyword">return</span> predicted
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict_sequence_full</span><span class="hljs-params">(model, data, window_size)</span>:</span>
+    <span class="hljs-comment">#Shift the window by 1 new prediction each time, re-run predictions on new window</span>
+    curr_frame = data[<span class="hljs-number">0</span>]
+    predicted = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(len(data)):
+        predicted.append(model.predict(curr_frame[newaxis,:,:])[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>])
+        curr_frame = curr_frame[<span class="hljs-number">1</span>:]
+        curr_frame = np.insert(curr_frame, [window_size<span class="hljs-number">-1</span>], predicted[<span class="hljs-number">-1</span>], axis=<span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span> predicted
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict_sequences_multiple</span><span class="hljs-params">(model, data, window_size, prediction_len)</span>:</span>
+    <span class="hljs-comment">#Predict sequence of 50 steps before shifting prediction run forward by 50 steps</span>
+    prediction_seqs = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(int(len(data)/prediction_len)):
+        curr_frame = data[i*prediction_len]
+        predicted = []
+        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> range(prediction_len):
+            predicted.append(model.predict(curr_frame[newaxis,:,:])[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>])
+            curr_frame = curr_frame[<span class="hljs-number">1</span>:]
+            curr_frame = np.insert(curr_frame, [window_size<span class="hljs-number">-1</span>], predicted[<span class="hljs-number">-1</span>], axis=<span class="hljs-number">0</span>)
+        prediction_seqs.append(predicted)
+    <span class="hljs-keyword">return</span> prediction_seqs
+</code>
+</pre>
+
+<p>&nbsp;</p>
+
+<h3><strong>run.py file</strong></h3>
+
+<p>&nbsp;</p>
+
+<pre><code class="python hljs"><span class="hljs-keyword">import</span> lstm
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">plot_results</span><span class="hljs-params">(predicted_data, true_data)</span>:</span>
+    fig = plt.figure(facecolor=<span class="hljs-string">'white'</span>)
+    ax = fig.add_subplot(<span class="hljs-number">111</span>)
+    ax.plot(true_data, label=<span class="hljs-string">'True Data'</span>)
+    plt.plot(predicted_data, label=<span class="hljs-string">'Prediction'</span>)
+    plt.legend()
+    plt.show()
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">plot_results_multiple</span><span class="hljs-params">(predicted_data, true_data, prediction_len)</span>:</span>
+    fig = plt.figure(facecolor=<span class="hljs-string">'white'</span>)
+    ax = fig.add_subplot(<span class="hljs-number">111</span>)
+    ax.plot(true_data, label=<span class="hljs-string">'True Data'</span>)
+    <span class="hljs-comment">#Pad the list of predictions to shift it in the graph to it's correct start</span>
+    <span class="hljs-keyword">for</span> i, data <span class="hljs-keyword">in</span> enumerate(predicted_data):
+        padding = [<span class="hljs-keyword">None</span> <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> range(i * prediction_len)]
+        plt.plot(padding + data, label=<span class="hljs-string">'Prediction'</span>)
+        plt.legend()
+    plt.show()
+
+<span class="hljs-comment">#Main Run Thread</span>
+<span class="hljs-keyword">if</span> __name__==<span class="hljs-string">'__main__'</span>:
+	global_start_time = time.time()
+	epochs  = <span class="hljs-number">1</span>
+	seq_len = <span class="hljs-number">50</span>
+
+	print(<span class="hljs-string">'&gt; Loading data... '</span>)
+
+	X_train, y_train, X_test, y_test = lstm.load_data(<span class="hljs-string">'sp500.csv'</span>, seq_len, <span class="hljs-keyword">True</span>)
+
+	print(<span class="hljs-string">'&gt; Data Loaded. Compiling...'</span>)
+
+	model = lstm.build_model([<span class="hljs-number">1</span>, <span class="hljs-number">50</span>, <span class="hljs-number">100</span>, <span class="hljs-number">1</span>])
+
+	model.fit(
+	    X_train,
+	    y_train,
+	    batch_size=<span class="hljs-number">512</span>,
+	    nb_epoch=epochs,
+	    validation_split=<span class="hljs-number">0.05</span>)
+
+	predictions = lstm.predict_sequences_multiple(model, X_test, seq_len, <span class="hljs-number">50</span>)
+	<span class="hljs-comment">#predicted = lstm.predict_sequence_full(model, X_test, seq_len)</span>
+	<span class="hljs-comment">#predicted = lstm.predict_point_by_point(model, X_test)        </span>
+
+	print(<span class="hljs-string">'Training duration (s) : '</span>, time.time() - global_start_time)
+	plot_results_multiple(predictions, y_test, <span class="hljs-number">50</span>)
+</code>
+</pre>
+
+<p>&nbsp;</p>		 	</div>
+
+			<div id="disqus_row">
+                <div id="disqus_thread"><iframe src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a.html" style="width: 1px ! important; min-width: 100% ! important; border: medium none ! important; overflow: hidden ! important; height: 487px ! important;" title="Disqus" tabindex="0" scrolling="no" allowtransparency="true" name="dsq-app4" id="dsq-app4" frameborder="0" width="100%"></iframe><iframe verticalscrolling="no" horizontalscrolling="no" src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/a_002.html" style="width: 1px ! important; min-width: 100% ! important; border: medium none ! important; overflow: hidden ! important; height: 8441px ! important;" title="Disqus" tabindex="0" scrolling="no" allowtransparency="true" name="dsq-app1" id="dsq-app1" frameborder="0" width="100%"></iframe><iframe style="width: 524px ! important; border: medium none ! important; overflow: hidden ! important; top: 0px ! important; min-width: 524px ! important; max-width: 524px ! important; position: fixed ! important; z-index: 2147483646 ! important; height: 19px ! important; min-height: 19px ! important; max-height: 19px ! important; display: none ! important;" title="Disqus" tabindex="0" scrolling="no" allowtransparency="true" name="indicator-north" id="indicator-north" frameborder="0"></iframe><iframe style="width: 524px ! important; border: medium none ! important; overflow: hidden ! important; bottom: 0px ! important; min-width: 524px ! important; max-width: 524px ! important; position: fixed ! important; z-index: 2147483646 ! important; height: 19px ! important; min-height: 19px ! important; max-height: 19px ! important; display: none ! important;" title="Disqus" tabindex="0" scrolling="no" allowtransparency="true" name="indicator-south" id="indicator-south" frameborder="0"></iframe></div>
+                <script>
+                    var disqus_config = function () {
+                        this.page.url = 'http://jakob-aungiers.com/articles/a/LSTM-Neural-Network-for-Time-Series-Prediction';
+                        this.page.identifier = 'LSTM-Neural-Network-for-Time-Series-Prediction';
+                    };
+                    
+                    (function() { // DON'T EDIT BELOW THIS LINE
+                        var d = document, s = d.createElement('script');
+                        s.src = '//jakob-aungiers.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            </div>
+
+
+		</div>
+		<div class="col-lg-1"></div>
+	</div>
+    </div>
+<iframe src="LSTM%20Neural%20Network%20for%20Time%20Series%20Prediction%20%7C%20Jakob%20Aungiers-Dateien/pp_461256.html" style="display:none;" height="0" width="0"></iframe>	
+	<div class="row center" id="nav">
+		<p class="footer">© Jakob Aungiers 2016</p>
+	</div>
+</div>
+
+<script>
+	(function(i,s,o,g,r,a,m) {
+		i['GoogleAnalyticsObject']=r;i[r]=i[r] || function() {
+	  (i[r].q=i[r].q||[]).push(arguments)
+	}, i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];
+		a.async=1;
+		a.src=g;
+		m.parentNode.insertBefore(a,m)
+	})
+
+	(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-30469450-1', 'auto');
+	ga('send', 'pageview');
+
+	function trackDownloadClick(label) {
+		ga('send', 'event', {
+			eventCategory: 'Outbound Link',
+			eventAction: 'click',
+			eventLabel: label,
+			transport: 'beacon'
+		});
+	}
+
+</script>
+
+<iframe style="display: none;"></iframe></body></html>

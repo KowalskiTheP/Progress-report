@@ -1,0 +1,16 @@
+@charset "utf-8";
+.product_pz{ font-family: arial; font-size: 12px;}
+.product_pz h4{ line-height: 40px; letter-spacing:5px;  font-weight: bold; font-size: 14px;}
+.product_pz table{ width: 100%; border-spacing: 0; border-collapse: collapse; border: 1px solid #ddd; margin: 0 auto;}
+.product_pz_style1 td{ width: 50%; padding: 20px 0; border-top: 1px solid #ddd; margin-top: -1px; vertical-align: top;}
+.product_pz_style1 p{  padding-left: 175px; line-height: 24px;}
+.product_pz_style1 .product_pz_img{ display: inline; float: left; width: 145px; text-align: center; margin-left: 15px;}
+.product_pz_style1 .product_pz_img p{ padding-left: 0; font-size: 14px; font-weight: bold; display: block; float: none;}
+.mainfeatures{ padding: 20px; border: 1px solid #ddd; line-height: 24px;}
+.product_pz_style2 th,.product_pz_style2 td{ border: 1px solid #ddd;}
+.product_pz_style2 th{ width: 200px; font-weight: bold; font-size: 14px; text-align: center; vertical-align: center;}
+.product_pz_style2 td{ padding: 15px; line-height: 24px;}
+.nomargin img{vertical-align: top; margin: 0; display: block;}
+.nomargin img + br{display: none;}
+/*大于1000的图片限制为700像素*/
+.self-adaption img{width:100%; max-width: 1200px;}
