@@ -151,20 +151,23 @@ def build_model(layers):
     model.add(LSTM(
         units=layers[1],
         input_shape=(None, layers[0]),
+        activation='relu',
         #input_dim=layers[0],
         #output_dim=layers[1],
         return_sequences=True))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.3))
 
-    #model.add(LSTM(
-    #    layers[2],
-    #    return_sequences=True))
-    #model.add(Dropout(0.2))
+    model.add(LSTM(
+        layers[2],
+        activation='relu',        
+        return_sequences=True))
+    model.add(Dropout(0.3))
     
     model.add(LSTM(
         layers[3],
+        activation='relu',        
         return_sequences=False))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.3))
 
     model.add(Dense(units=layers[4]))
     
@@ -194,9 +197,9 @@ def build_model(layers):
 # trainPredict = model.predict(trainX)
 # testPredict = model.predict(testX)
 
-layers = [1, 50, 100, 100, 1]
+layers = [1, 100, 100, 100, 1]
 model = build_model(layers)
-epochs=1
+epochs=10
 model.fit(
     trainX,
     trainY,
