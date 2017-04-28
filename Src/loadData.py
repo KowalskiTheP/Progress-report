@@ -29,12 +29,12 @@ def getDataSet(dataframe, columns):
   return dataSet
 
 ## Shifting the data by look_back to create usefull x and y arrays
-def shiftData(data, look_back):
+def shiftData(data, y_column, look_back):
   x = np.zeros((len(data)-look_back,data.shape[1]))
   y = np.zeros((len(data)-look_back,1))
   for i in range(len(data)-look_back):
     x[i] = data[i]
-    y[i] = data[i+1]
+    y[i] = data[i+1,y_column]
   return x, y
 
 ## The single windows will be the samples for the model

@@ -17,6 +17,19 @@ def readINI(filename):
   
   #print configfileArgs
   #print confParser.sections()
+  for name, value in confParser.items('input'):
+    if ',' in configfileArgs[name]:
+      configfileArgs[name] = value.split(',')
+  
+  if isinstance(configfileArgs['columns'], list):
+    valuesNew = [int(item) for item in configfileArgs['columns']]
+    configfileArgs['columns'] = valuesNew
+  else:
+    configfileArgs['columns'] = [int(configfileArgs['columns'])]
+    
+  configfileArgs['y_column'] = int(configfileArgs['y_column'])
+
+  
   for name, value in confParser.items('network'):
     if ',' in configfileArgs[name]:
       configfileArgs[name] = value.split(',')
