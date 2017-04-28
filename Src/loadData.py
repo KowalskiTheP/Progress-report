@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
 from datetime import datetime
 
 ## loading data from a CSV file in a pandas DataFrame. 
@@ -27,7 +28,11 @@ def getDataSet(dataframe, columns):
   dataSet = np.zeros((len(dataframe), len(columns)))
   for i in range(len(columns)):
     dataSet[:,i] = dataframe.iloc[:,columns[i]]
-  return dataSet
+  
+  trainSet, testSet = train_test_split(dataSet, test_size = 0.3)
+  
+  return trainSet, testSet
+
 
 ## Shifting the data by look_back to create usefull x and y arrays
 def shiftData(data, y_column, look_back):

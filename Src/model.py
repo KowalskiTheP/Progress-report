@@ -2,6 +2,8 @@ import time
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.optimizers import Adam
+import numpy as np
 
 def build_model(params):
     start = time.time()
@@ -56,6 +58,15 @@ def build_model(params):
     print("> Build time : ", time.time() - start)
     
     start = time.time()
-    model.compile(loss=params['loss'], optimizer=params['optimiser'])
+    if params['optimiser'] == 'adam':
+        opt = Adam(lr = float(params['learningrate']))
+    model.compile(loss=params['loss'], optimizer=opt)
     print("> Compilation Time : ", time.time() - start)
     return model
+
+def predict_point_by_point(model, data):
+    #Predict each timestep given the last sequence of true data, in effect only predicting 1 step ahead each time
+    predicted = model.predict(data)
+    predicted = np.reshape(predicted, (predicted.size,))
+    return predicted
+
