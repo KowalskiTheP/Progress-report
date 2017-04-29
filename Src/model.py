@@ -4,6 +4,10 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.optimizers import Adam
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import scipy.stats as stats
+from tabulate import tabulate
 
 def build_model(params):
     start = time.time()
@@ -55,14 +59,17 @@ def build_model(params):
         )
     )
     
-    print("> Build time : ", time.time() - start)
+    print '> Build time : ', time.time() - start
     
     start = time.time()
     if params['optimiser'] == 'adam':
         opt = Adam(lr = float(params['learningrate']))
     model.compile(loss=params['loss'], optimizer=opt)
-    print("> Compilation Time : ", time.time() - start)
+    print '> Compilation Time : ', time.time() - start
     return model
+
+
+
 
 def predict_point_by_point(model, data):
     #Predict each timestep given the last sequence of true data, in effect only predicting 1 step ahead each time
@@ -70,3 +77,40 @@ def predict_point_by_point(model, data):
     predicted = np.reshape(predicted, (predicted.size,))
     return predicted
 
+
+
+
+def plot_data(true_data, pred_data, title='Your data'):
+    '''makes simple plots of the evaluated data, nothing fancy'''
+    
+    #plt.ion()
+    
+    plt.title(title)
+    plt.plot(true_data, ls='--', linewidth=2, color='tomato')
+    plt.plot(pred_data, linewidth=2, color='indigo')
+    tomato_patch = mpatches.Patch(color='tomato', label='true data')
+    indigo_patch = mpatches.Patch(color='indigo', label='pred. data')
+    plt.legend(handles=[tomato_patch,indigo_patch])
+    axes = plt.gca()
+    axes.set_ylim([-0.1,1.1])
+    plt.show()
+
+
+
+
+def eval_model(test_x, test_y, trainedModel, config, tableHeader):
+    '''calculate some core metrics for model evaluation'''
+    
+    score = trainedModel.evaluate(test_x, test_y, batch_size=int(config['batchsize']))
+    pred = predict_point_by_point(trainedModel, test_x)
+    rp, rp_P = stats.pearsonr(pred,test_y)
+    rs, rs_P = stats.spearmanr(pred,test_y)
+    sd = np.std(pred-test_y)
+    print '------', tableHeader, '------'
+    print tabulate({"metric": ['test loss', 'Rp', 'Rs', 'SD'],"model": [score, rp, rs, sd]}, headers="keys", tablefmt="orgtbl")
+    np.savetxt(config['predictionfile'], np.column_stack((pred, test_y)), delimiter=' ')
+    
+    return pred
+    
+    
+    

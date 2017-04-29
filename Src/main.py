@@ -48,25 +48,45 @@ print y_win_scaledTrain
   
 print '> Data loaded! This took: ', time.time() - loadData_start_time, 'seconds'
 
-
+# build the specified model
 model1 = model.build_model(config)
 
+# train the model
 model1.fit(x_win_scaledTrain, y_win_scaledTrain, int(config['batchsize']), int(config['epochs']))
 
+# simple predictions or eval metrics
+y_win_scaledTest = y_win_scaledTest.flatten()
+y_win_scaledTrain = y_win_scaledTrain.flatten()
 
-trainPredict = model.predict_point_by_point(model1, x_win_scaledTrain)
-testPredict = model.predict_point_by_point(model1, x_win_scaledTest)
+if config['evalmetrics'] == 'on':
+    
+    predTest = model.eval_model(x_win_scaledTest, y_win_scaledTest, model1, config, 'test data')
+    predTrain = model.eval_model(x_win_scaledTrain, y_win_scaledTrain, model1, config, 'train data')
+    
+else:
+
+    predTest = model.predict_point_by_point(model1, x_win_scaledTest)
+    predTrain = model.predict_point_by_point(model1, x_win_scaledTrain)
+    print np.column_stack((pred, y_win_scaledTest))
+
+
+if config['plotting'] == 'on':
+    model.plot_data(y_win_scaledTest, predTest)
+    model.plot_data(y_win_scaledTrain, predTrain)
+
+#trainPredict = model.predict_point_by_point(model1, x_win_scaledTrain)
+#testPredict = model.predict_point_by_point(model1, x_win_scaledTest)
 
 
 
-plt.plot(y_win_scaledTrain)
-plt.plot(trainPredict)
-axes = plt.gca()
-axes.set_ylim([-0.1,1.1])
-plt.show()
+#plt.plot(y_win_scaledTrain)
+#plt.plot(trainPredict)
+#axes = plt.gca()
+#axes.set_ylim([-0.1,1.1])
+#plt.show()
 
-plt.plot(y_win_scaledTest)
-plt.plot(testPredict)
-axes = plt.gca()
-axes.set_ylim([-0.1,1.1])
-plt.show()
+#plt.plot(y_win_scaledTest)
+#plt.plot(testPredict)
+#axes = plt.gca()
+#axes.set_ylim([-0.1,1.1])
+#plt.show()
