@@ -92,7 +92,7 @@ def plot_data(true_data, pred_data, title='Your data'):
     indigo_patch = mpatches.Patch(color='indigo', label='pred. data')
     plt.legend(handles=[tomato_patch,indigo_patch])
     axes = plt.gca()
-    axes.set_ylim([-0.1,1.1])
+    axes.set_ylim([800,13000])
     plt.show()
 
 

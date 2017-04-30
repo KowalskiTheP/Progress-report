@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from datetime import datetime
+import sys
 
 ## loading data from a CSV file in a pandas DataFrame. 
 ## The diff between the values in dateColumn and the refdate gets also calculated and added.
@@ -24,13 +25,22 @@ def load_fromCSV(csvFile, decimal , seperator, header, dateColumn):
 
 ## Creating a numpy array with all data from the selected columns 
 ## of the previosly initialised dataFrame
-def getDataSet(dataframe, columns):
+def getDataSet(dataframe, columns, trainTestSplit):
   dataSet = np.zeros((len(dataframe), len(columns)))
   for i in range(len(columns)):
     dataSet[:,i] = dataframe.iloc[:,columns[i]]
   
-  trainSet, testSet = train_test_split(dataSet, test_size = 0.3)
+  ############### maybe dont split train and test set randomly??? sounds crazy with a time series?
+  #trainSet, testSet = train_test_split(dataSet, test_size = trainTestSplit)
   
+  # first try last X percent of the dataset are the test set. PLEASE REVIEW!!!!
+  # In principle it works now...
+  lastXpercent = int(np.floor(len(dataframe)*trainTestSplit))
+  firstXpercent = len(dataframe) - lastXpercent
+  
+  trainSet = dataSet[0:firstXpercent]
+  testSet = dataSet[firstXpercent:firstXpercent+lastXpercent]
+
   return trainSet, testSet
 
 
@@ -56,7 +66,22 @@ def normalise_data(x_data, y_data):
   scaler.fit(x_data)
   x_scaled = scaler.transform(x_data)
   y_scaled = scaler.transform(y_data)
-  return x_scaled, y_scaled
+  return x_scaled, y_scaled, scaler
+
+
+def make_windowed_data(dataframe, config):
+  ''' makes the windowed dataset from a appropriate dataframe'''
+  
+  dataSetTrain, dataSetTest = getDataSet(dataframe, config['columns'], float(config['traintestsplit']))
+  dataSetTrain, dataSetTest, scaler = normalise_data(dataSetTrain, dataSetTest)
+  #print dataSetTrain
+  #print dataSetTest
+  x_fullTrain, y_fullTrain = shiftData(dataSetTrain, config['y_column'], int(config['look_back']))
+  x_winTrain, y_winTrain = get_windows(x_fullTrain,y_fullTrain,int(config['winlength']))
+  x_fullTest, y_fullTest = shiftData(dataSetTest, config['y_column'], int(config['look_back']))
+  x_winTest, y_winTest = get_windows(x_fullTest,y_fullTest,int(config['winlength']))
+  
+  return x_winTrain, y_winTrain, x_winTest, y_winTest, scaler
   
 
 ## Following lines were used to test the functions  
