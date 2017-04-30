@@ -34,7 +34,7 @@ def getDataSet(dataframe, columns, trainTestSplit):
   #trainSet, testSet = train_test_split(dataSet, test_size = trainTestSplit)
   
   # first try last X percent of the dataset are the test set. PLEASE REVIEW!!!!
-  # In principle it works now...
+  # In principle it works now...but the data partioning has to be refined...COME ON RANDOM DATA GENERATOR!
   lastXpercent = int(np.floor(len(dataframe)*trainTestSplit))
   firstXpercent = len(dataframe) - lastXpercent
   
