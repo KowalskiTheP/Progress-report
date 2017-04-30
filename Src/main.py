@@ -2,14 +2,16 @@ import readConf
 import model
 import loadData
 
+import os
 import time
 import numpy as np
 import sys
 
 #import matplotlib.pyplot as plt
 
-config = readConf.readINI("../Data/config.conf")
+config = readConf.readINI("../Data/config_tests.conf")
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(config['loglevel'])
   
 global_start_time = time.time()
   
