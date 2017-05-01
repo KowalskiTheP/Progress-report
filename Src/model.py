@@ -4,6 +4,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.optimizers import Adam
 from keras.layers import Dropout
+from keras.layers.normalization import BatchNormalization
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -27,6 +28,9 @@ def build_model(params):
       recurrent_activation = str(params['recurrentactivation'][0])
       )
     )
+    if str(params['batchnorm']) == 'on':
+      model.add(BatchNormalization())
+    
     model.add(Dropout(float(params['dropout'][0])))
 
     # all interims layer get done by this for loop
@@ -39,6 +43,9 @@ def build_model(params):
         recurrent_activation = str(params['recurrentactivation'][i])
         )
       )
+      if str(params['batchnorm']) == 'on':
+        model.add(BatchNormalization())
+
       model.add(Dropout(float(params['dropout'][i])))
     
     #last LSTM layer is special because return_sequences=False
@@ -50,6 +57,8 @@ def build_model(params):
       recurrent_activation = str(params['recurrentactivation'][-1])
       )
     )
+    if str(params['batchnorm']) == 'on':
+      model.add(BatchNormalization())
     model.add(Dropout(float(params['dropout'][-1])))
     
     #last layer is dense
@@ -64,7 +73,9 @@ def build_model(params):
     
     start = time.time()
     if params['optimiser'] == 'adam':
-        opt = Adam(lr = float(params['learningrate']))
+        opt = Adam(lr = float(params['learningrate']),
+                   decay=float(params['decay']),
+                   )
     model.compile(loss=params['loss'], optimizer=opt)
     print '> Compilation Time : ', time.time() - start
     return model
