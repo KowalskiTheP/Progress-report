@@ -130,6 +130,31 @@ def make_windowed_data_rewied(dataframe, config):
                                                           int(config['winlength']),
                                                           int(config['look_back']))
   return  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, refValue
+
+def make_windowed_data_normOnWin(dataframe, config):
+  refValue = 12000.0
+  dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
+  dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
+  x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain,
+                                                int(config['winlength']),
+                                                int(config['look_back']))
+  x_winTest, y_winTest = get_windows_andShift(dataSetTest,
+                                              int(config['winlength']),
+                                              int(config['look_back']))
+  
+  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
+  for i in range(len(y_winTrain)):
+    x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
+    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],y_winTrain[i]))
+    trainRef.append(x_winTrain[i,-1])
+  for i in range(len(y_winTest)):
+    x_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
+    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],y_winTest[i]))
+    testRef.append(x_winTest[i,-1])
+  
+  print np.array(x_winTrain_norm).shape
+  
+  return np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),int(config['winlength']),1)), np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),1)), np.reshape(np.array(x_winTest_norm),(len(x_winTest_norm),int(config['winlength']),1)), np.reshape(np.array(y_winTest_norm),(len(y_winTest_norm),1)), trainRef, testRef
   
   
 
