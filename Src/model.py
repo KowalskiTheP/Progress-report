@@ -3,6 +3,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.optimizers import Adam
+from keras.layers import Dropout
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -23,10 +24,10 @@ def build_model(params):
       input_shape = (None, int(params['inputdim'])),
       activation = str(params['activationperlayer'][0]),
       return_sequences=True,
-      dropout = float(params['dropout'][0]),
       recurrent_activation = str(params['recurrentactivation'][0])
       )
     )
+    model.add(Dropout(float(params['dropout'][0])))
 
     # all interims layer get done by this for loop
     for i in xrange(1,len(params['neuronsperlayer'])-1):
@@ -35,10 +36,10 @@ def build_model(params):
         int(params['neuronsperlayer'][i]),
         activation = str(params['activationperlayer'][i]),
         return_sequences=True,
-        dropout = float(params['dropout'][i]),
         recurrent_activation = str(params['recurrentactivation'][i])
         )
       )
+      model.add(Dropout(float(params['dropout'][i])))
     
     #last LSTM layer is special because return_sequences=False
     print 'last LSTM layer: ',params['neuronsperlayer'][-1]
@@ -46,10 +47,10 @@ def build_model(params):
       int(params['neuronsperlayer'][-1]),
       activation = str(params['activationperlayer'][-1]),
       return_sequences=False,
-      dropout = float(params['dropout'][-1]),
       recurrent_activation = str(params['recurrentactivation'][-1])
       )
     )
+    model.add(Dropout(float(params['dropout'][-1])))
     
     #last layer is dense
     print 'last layer (dense): ',params['outputdim']    
@@ -92,7 +93,7 @@ def plot_data(true_data, pred_data, title='Your data'):
     indigo_patch = mpatches.Patch(color='indigo', label='pred. data')
     plt.legend(handles=[tomato_patch,indigo_patch])
     axes = plt.gca()
-    axes.set_ylim([800,13000])
+    plt.autoscale(enable=True, axis='y')
     plt.show()
 
 

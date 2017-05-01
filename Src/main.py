@@ -9,7 +9,7 @@ import sys
 
 #import matplotlib.pyplot as plt
 
-config = readConf.readINI("../Data/config_tests.conf")
+config = readConf.readINI("../Data/config.conf")
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = str(config['loglevel'])
   
