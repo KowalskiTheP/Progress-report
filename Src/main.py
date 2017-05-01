@@ -23,7 +23,11 @@ dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['heade
 if config['windoweddata'] == 'on':
   
   print '> Windowing data..be patient little Padawan'
-  x_winTrain, y_winTrain, x_winTest, y_winTest, scaler = loadData.make_windowed_data(dataframe, config)
+#  x_winTrain, y_winTrain, x_winTest, y_winTest, scaler = loadData.make_windowed_data(dataframe, config)
+  x_winTrain, y_winTrain, x_winTest, y_winTest, refValue = loadData.make_windowed_data_rewied(dataframe, config)
+  
+  print len(y_winTrain)
+  print x_winTest[-3:-1], y_winTest[-3:-1]
 
 else:
   print 'not implemented so far, exiting!'
@@ -53,10 +57,15 @@ else:
 
 if config['plotting'] == 'on':
   
-  predTest = scaler.inverse_transform(predTest)
-  y_winTest = scaler.inverse_transform(y_winTest)
-  y_winTrain = scaler.inverse_transform(y_winTrain)
-  predTrain = scaler.inverse_transform(predTrain)
+  #predTest = scaler.inverse_transform(predTest)
+  #y_winTest = scaler.inverse_transform(y_winTest)
+  #y_winTrain = scaler.inverse_transform(y_winTrain)
+  #predTrain = scaler.inverse_transform(predTrain)
+  
+  predTest = loadData.denormalise_data_refValue(refValue,predTest)
+  y_winTest = loadData.denormalise_data_refValue(refValue,y_winTest)
+  y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
+  predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
   
   model.plot_data(y_winTest, predTest)
   model.plot_data(y_winTrain, predTrain)
