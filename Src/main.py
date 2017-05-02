@@ -23,18 +23,17 @@ dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['heade
 if config['windoweddata'] == 'on':
   
   print '> Windowing data..be patient little Padawan'
-#  x_winTrain, y_winTrain, x_winTest, y_winTest, scaler = loadData.make_windowed_data(dataframe, config)
-
-#  x_winTrain, y_winTrain, x_winTest, y_winTest, refValue = loadData.make_windowed_data_rewied(dataframe, config)
   
- 
-
-  x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
+  if config['normalise'] == '1':
+    x_winTrain, y_winTrain, x_winTest, y_winTest, scaler = loadData.make_windowed_data(dataframe, config)  
   
-  print 'Shape of "x_winTrain"',x_winTrain.shape
-  
-  print 'Length of "y_winTrain"',len(y_winTrain)
-  print x_winTest[-3:-1], y_winTest[-3:-1]
+  if config['normalise'] == '2':
+    refValue = float(config['refvalue'])
+    x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
+    
+  if config['normalise'] == '3':
+    print 'puhhhhhhhhhhhhhhhhhhhhhhhhhh'
+    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
 
 else:
   print 'not implemented so far, exiting!'
@@ -55,27 +54,26 @@ y_winTrain = y_winTrain.flatten()
 if config['evalmetrics'] == 'on':
   predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
   predTrain = model.eval_model(x_winTrain, y_winTrain, model1, config, 'train data')
-    
 else:
   predTest = model.predict_point_by_point(model1, x_winTest)
   predTrain = model.predict_point_by_point(model1, x_winTrain)
   print np.column_stack((pred, y_winTest))
+  
 
+if config['normalise'] == '1':
+  predTest = scaler.inverse_transform(predTest)
+  y_winTest = scaler.inverse_transform(y_winTest)
+  y_winTrain = scaler.inverse_transform(y_winTrain)
+  predTrain = scaler.inverse_transform(predTrain)
 
-if config['plotting'] == 'on':
+if config['normalise'] == '2':
+  refValue = float(config['refvalue'])
+  predTest = loadData.denormalise_data_refValue(refValue,predTest)
+  y_winTest = loadData.denormalise_data_refValue(refValue,y_winTest)
+  y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
+  predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
   
-  #predTest = scaler.inverse_transform(predTest)
-  #y_winTest = scaler.inverse_transform(y_winTest)
-  #y_winTrain = scaler.inverse_transform(y_winTrain)
-  #predTrain = scaler.inverse_transform(predTrain)
-  
-  #predTest = loadData.denormalise_data_refValue(refValue,predTest)
-  #y_winTest = loadData.denormalise_data_refValue(refValue,y_winTest)
-  #y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
-  #predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
-  
-  print len(predTest), len(y_winTest)
-  
+if config['normalise'] == '3':
   for i in range(len(testRef)):
     predTest[i] = testRef[i]*predTest[i]
     y_winTest[i] = testRef[i]*y_winTest[i]
@@ -83,8 +81,12 @@ if config['plotting'] == 'on':
     y_winTrain[i] = trainRef[i]*y_winTrain[i]
     predTrain[i] = trainRef[i]*predTrain[i]
   
+      
+if config['plotting'] == 'on':
   model.plot_data(y_winTrain, predTrain)
   model.plot_data(y_winTest, predTest)
   model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
+ 
+
 
 
