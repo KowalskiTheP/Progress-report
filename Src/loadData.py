@@ -112,8 +112,8 @@ def get_windows_andShift(x,winLength,look_back):
   x_train, y_train = [], []
   for i in range(len(x)-(winLength+1)):
     x_train.append(x[i:i+winLength])
-    y_train.append(x[i+winLength+look_back-1])
-  return np.array(x_train), np.array(y_train)
+    y_train.append(x[(i+winLength+look_back-1),-1])
+  return np.array(x_train), np.reshape(np.array(y_train),(len(y_train),1))
 
 ###############################################
 
@@ -135,25 +135,38 @@ def make_windowed_data_normOnWin(dataframe, config):
   refValue = float(config['refvalue'])
   winL = int(config['winlength'])
   lookB = int(config['look_back'])
+  xDim = len(config['columns'])
   dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
   dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
   x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain, winL, lookB)
   x_winTest, y_winTest = get_windows_andShift(dataSetTest, winL, lookB)
   
+  print 'y_winTrain shape: ',y_winTrain[0].shape
+  print 'y_winTrain length: ',len(y_winTrain[0])
+  
+  print x_winTrain[-2:-1]
+  print y_winTrain[-2:-1]
+  print x_winTrain.shape
+  
   x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
   for i in range(len(y_winTrain)):
     x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
-    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],y_winTrain[i]))
+    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,-1],y_winTrain[i]))
     trainRef.append(x_winTrain[i,-1])
   for i in range(len(y_winTest)):
     x_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
-    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],y_winTest[i]))
+    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1,-1],y_winTest[i]))
     testRef.append(x_winTest[i,-1])
+    
+  print 'x_winTrain_norm[-2:-1]:\n', x_winTrain_norm[-2:-1]
+  print 'y_winTrain_norm[-2:-1]:\n', y_winTrain_norm[-2:-1]
   
-  return np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),int(config['winlength']),1)), np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),1)), np.reshape(np.array(x_winTest_norm),(len(x_winTest_norm),int(config['winlength']),1)), np.reshape(np.array(y_winTest_norm),(len(y_winTest_norm),1)), trainRef, testRef
+  x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
+  y_winTrain_norm = np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),1 ))
+  x_winTest_norm =  np.reshape(np.array(x_winTest_norm) ,(len(x_winTest_norm) ,winL,xDim ))
+  y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,1 ))
   
-  
-
+  return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
 
 ## Following lines were used to test the functions  
 

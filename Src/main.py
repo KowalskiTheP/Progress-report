@@ -33,6 +33,8 @@ if config['windoweddata'] == 'on':
     
   if config['normalise'] == '3':
     x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
+    print trainRef[0]
+    print trainRef[0,-1]
 
 else:
   print 'not implemented so far, exiting!'
@@ -73,18 +75,22 @@ if config['normalise'] == '2':
   predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
   
 if config['normalise'] == '3':
+  print trainRef
   for i in range(len(testRef)):
-    predTest[i] = testRef[i]*predTest[i]
-    y_winTest[i] = testRef[i]*y_winTest[i]
+    predTest[i] = testRef[i,-1]*predTest[i]
+    y_winTest[i] = testRef[i,-1]*y_winTest[i]
   for i in range(len(trainRef)):
-    y_winTrain[i] = trainRef[i]*y_winTrain[i]
-    predTrain[i] = trainRef[i]*predTrain[i]
+    y_winTrain[i] = trainRef[i,-1]*y_winTrain[i]
+    predTrain[i] = trainRef[i,-1]*predTrain[i]
   
+diffTrain = np.sqrt((predTest - y_winTest)**2)
+print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
+print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
       
 if config['plotting'] == 'on':
   model.plot_data(y_winTrain, predTrain)
   model.plot_data(y_winTest, predTest)
-  model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
+  model.plot_data(y_winTest[-15:-1], predTest[-15:-1])
  
 
 
