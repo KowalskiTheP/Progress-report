@@ -32,7 +32,6 @@ if config['windoweddata'] == 'on':
     x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
     
   if config['normalise'] == '3':
-    print 'puhhhhhhhhhhhhhhhhhhhhhhhhhh'
     x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
 
 else:
