@@ -137,23 +137,47 @@ def get_random_hyperparameterset(config):
   '''draws a random hyperparameter set when called'''
   
   params = {}
-  params['nlayer_tune'] = int(config['nlayer_tune'][np.random.random_integers(0,len(config['nlayer_tune'])-1)])
-  params['actlayer_tune'] = str(config['actlayer_tune'][np.random.random_integers(0,len(config['actlayer_tune'])-1)])
-  params['nhiduplayer_tune'] = int(config['nhiduplayer_tune'][np.random.random_integers(0,len(config['nhiduplayer_tune'])-1)])
-  params['dropout_tune'] = float(config['dropout_tune'][np.random.random_integers(0,len(config['dropout_tune'])-1)])
+  
+  if isinstance(config['nlayer_tune'], list) is True:
+    params['nlayer_tune'] = int(config['nlayer_tune'][np.random.random_integers(0,len(config['nlayer_tune'])-1)])
+  else:
+    params['nlayer_tune'] = int(config['nlayer_tune'])
+  
+  if isinstance(config['actlayer_tune'], list) is True:
+    params['actlayer_tune'] = str(config['actlayer_tune'][np.random.random_integers(0,len(config['actlayer_tune'])-1)])
+  else:
+    params['actlayer_tune'] = str(config['actlayer_tune'])
+  
+  if isinstance(config['nhiduplayer_tune'], list) is True:
+    params['nhiduplayer_tune'] = int(config['nhiduplayer_tune'][np.random.random_integers(0,len(config['nhiduplayer_tune'])-1)])
+  else:
+    params['nhiduplayer_tune'] = int(config['nhiduplayer_tune'])
+  
+  if isinstance(config['dropout_tune'], list) is True:
+    params['dropout_tune'] = float(config['dropout_tune'][np.random.random_integers(0,len(config['dropout_tune'])-1)])
+  else:
+    params['dropout_tune'] = float(config['dropout_tune'])
+
+  if isinstance(config['recactlayer_tune'], list) is True:
+    params['recactlayer_tune'] = str(config['recactlayer_tune'][np.random.random_integers(0,len(config['recactlayer_tune'])-1)])
+  else:
+    params['recactlayer_tune'] = str(config['recactlayer_tune'])
   
   temp = []
   temp1 = []
   temp2 = []
+  temp3 = []
   for i in xrange(0,params['nlayer_tune']):
     
     temp.append(params['actlayer_tune'])
     temp1.append(params['nhiduplayer_tune'])
     temp2.append(params['dropout_tune'])
+    temp3.append(params['recactlayer_tune'])
   
   config['neuronsperlayer'] = temp1
   config['activationperlayer'] = temp
   config['dropout'] = temp2
+  config['recurrentactivation'] = temp3
   config['learningrate'] = float(config['lr_tune'][np.random.random_integers(0,len(config['lr_tune'])-1)])
   config['batchsize'] = int(config['batchsize_tune'][np.random.random_integers(0,len(config['batchsize_tune'])-1)])
   config['batchnorm'] = str(config['batchnorm_tune'][np.random.random_integers(0,len(config['batchnorm_tune'])-1)])
