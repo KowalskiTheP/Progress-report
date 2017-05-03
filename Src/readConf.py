@@ -33,6 +33,10 @@ def readINI(filename):
   for name, value in confParser.items('network'):
     if ',' in configfileArgs[name]:
       configfileArgs[name] = value.split(',')
+
+  for name, value in confParser.items('tuning'):
+    if ',' in configfileArgs[name]:
+      configfileArgs[name] = value.split(',')
   #print configfileArgs
   
   if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['activationperlayer'], list):
@@ -71,40 +75,28 @@ def readINI(filename):
       
 
  
-  #for name, value in confParser.items('tuningParams'):
-    #if configfileArgs[name] is not None:
-      #if name == 'learningratetune':
-        #valuesNew = [float(item) for item in configfileArgs[name]]
-        #param['lr'] = valuesNew
-      #elif name == 'batchsizetune':
-        #valuesNew = [int(item) for item in configfileArgs[name]]
-        #param['batch_size'] = valuesNew
-      #elif name == 'nlayertune':
-        #valuesNew = [int(item) for item in configfileArgs[name]]
-        #param['number_of_layers'] = valuesNew
-      #elif name == 'actlayertune':
-        #valuesNew = [str(item) for item in configfileArgs[name]]
-        #param['activation_layer'] = valuesNew
-      #elif name == 'nhidunitsplayertune':
-        #valuesNew = [int(item) for item in configfileArgs[name]]
-        #param['n_hid_units_p_layer'] = valuesNew
-      #elif name == 'l2regtune':
-        #valuesNew = [float(item) for item in configfileArgs[name]]
-        #param['Weight_reg'] = valuesNew
-      #elif name == 'biastune':
-        #valuesNew = [str(item) for item in configfileArgs[name]]
-        #param['biasVar'] = valuesNew
-      #elif name == 'dropouttune':
-        #valuesNew = [float(item) for item in configfileArgs[name]]
-        #param['dropout_hidden'] = valuesNew
-      #elif name == 'batchnormtune':
-        #valuesNew = [str(item) for item in configfileArgs[name]]
-        #param['batch_norm'] = valuesNew
-      #elif name == 'optimisertune':
-        #valuesNew = [str(item) for item in configfileArgs[name]]
-        #param['optimizerPar'] = valuesNew
-      #elif name == 'losstune':
-        #valuesNew = [str(item) for item in configfileArgs[name]]
-        #param['lossV'] = valuesNew
+  for name, value in confParser.items('tuning'):
+    if configfileArgs[name] is not None:
+      if name == 'nlayer_tune':
+        valuesNew = [int(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'actlayer_tune':
+        valuesNew = [str(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'nhiduplayer_tune':
+        valuesNew = [int(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'dropout_tune':
+        valuesNew = [float(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'lr_tune':
+        valuesNew = [float(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'batchsize_tune':
+        valuesNew = [int(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
+      elif name == 'batchnorm_tune':
+        valuesNew = [str(item) for item in configfileArgs[name]]
+        configfileArgs[name] = valuesNew
 
   return configfileArgs
