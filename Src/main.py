@@ -33,8 +33,8 @@ if config['windoweddata'] == 'on':
     
   if config['normalise'] == '3':
     x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
-    print trainRef[0]
-    print trainRef[0,-1]
+    print 'len(x_winTest): ', len(x_winTest)
+    print 'len(y_winTest): ', len(y_winTest)
 
 else:
   print 'not implemented so far, exiting!'
@@ -49,8 +49,9 @@ model1 = model.build_model(config)
 model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
 
 # simple predictions or eval metrics
-y_winTest = y_winTest.flatten()
-y_winTrain = y_winTrain.flatten()
+#y_winTest = y_winTest.flatten()
+#y_winTrain = y_winTrain.flatten()
+
 
 if config['evalmetrics'] == 'on':
   predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
@@ -82,15 +83,36 @@ if config['normalise'] == '3':
   for i in range(len(trainRef)):
     y_winTrain[i] = trainRef[i,-1]*y_winTrain[i]
     predTrain[i] = trainRef[i,-1]*predTrain[i]
-  
+    
+
+yDim = int(config['outputdim'])
+# If the y-dimension is bigger then one, some additional mambo jambo 
+# has to be done to get corresponding y and ^y values
+if yDim > 1:
+  predTrain = np.reshape(predTrain,(len(y_winTrain),yDim))
+  l = list(range(0, yDim-1))
+  lback = list(range((len(y_winTest)-yDim+1),len(y_winTest)))
+  lfull = l + lback
+  y_winTest = np.delete(y_winTest, lfull, 0)
+  y_winTest = np.delete(y_winTest, l, 1)
+  y_winTest = y_winTest.flatten()
+  tmpPredTest = []
+  tmpPredTest_test = []
+  for i in range(len(y_winTest)):
+    tmpY = 0.
+    for j in range(yDim):
+      tmpY = tmpY + predTest[i+j,yDim-1-j]
+    tmpPredTest.append(tmpY/yDim)
+  predTest = np.array(tmpPredTest)
+
 diffTrain = np.sqrt((predTest - y_winTest)**2)
 print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
 print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
       
 if config['plotting'] == 'on':
-  model.plot_data(y_winTrain, predTrain)
-  model.plot_data(y_winTest, predTest)
-  model.plot_data(y_winTest[-15:-1], predTest[-15:-1])
+#  model.plot_data(y_winTrain, predTrain)
+#  model.plot_data(y_winTest, predTest)
+  model.plot_data(y_winTest[-100:-1], predTest[-100:-1])
  
 
 
