@@ -224,7 +224,7 @@ def hypertune(X_train, Y_train, config):
   start = time.time()
   print '> hyperparameter tuning through the hyperband algorithm will be done'
   
-  max_iter = 103  # maximum iterations/epochs per configuration
+  max_iter = 81  # maximum iterations/epochs per configuration
   eta = 3 # defines downsampling rate (default=3)
   logeta = lambda x: np.log(x)/np.log(eta)
   s_max = int(logeta(max_iter))  # number of unique executions of Successive Halving (minus one)
