@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import scipy.stats as stats
 from tabulate import tabulate
+import copy
 
 def build_model(params):
   '''builds model that is specified in params'''
@@ -135,33 +136,35 @@ def eval_model(test_x, test_y, trainedModel, config, tableHeader):
 
 def get_random_hyperparameterset(config):
   '''draws a random hyperparameter set when called'''
-  
+  #np.random.seed(seed=int(time.time()))
+  config1 = copy.deepcopy(config)
   params = {}
   
-  if isinstance(config['nlayer_tune'], list) is True:
-    params['nlayer_tune'] = int(config['nlayer_tune'][np.random.random_integers(0,len(config['nlayer_tune'])-1)])
-  else:
-    params['nlayer_tune'] = int(config['nlayer_tune'])
   
-  if isinstance(config['actlayer_tune'], list) is True:
-    params['actlayer_tune'] = str(config['actlayer_tune'][np.random.random_integers(0,len(config['actlayer_tune'])-1)])
+  if isinstance(config1['nlayer_tune'], list) is True:
+    params['nlayer_tune'] = int(config1['nlayer_tune'][np.random.random_integers(0,len(config1['nlayer_tune'])-1)])
   else:
-    params['actlayer_tune'] = str(config['actlayer_tune'])
+    params['nlayer_tune'] = int(config1['nlayer_tune'])
   
-  if isinstance(config['nhiduplayer_tune'], list) is True:
-    params['nhiduplayer_tune'] = int(config['nhiduplayer_tune'][np.random.random_integers(0,len(config['nhiduplayer_tune'])-1)])
+  if isinstance(config1['actlayer_tune'], list) is True:
+    params['actlayer_tune'] = str(config1['actlayer_tune'][np.random.random_integers(0,len(config1['actlayer_tune'])-1)])
   else:
-    params['nhiduplayer_tune'] = int(config['nhiduplayer_tune'])
+    params['actlayer_tune'] = str(config1['actlayer_tune'])
   
-  if isinstance(config['dropout_tune'], list) is True:
-    params['dropout_tune'] = float(config['dropout_tune'][np.random.random_integers(0,len(config['dropout_tune'])-1)])
+  if isinstance(config1['nhiduplayer_tune'], list) is True:
+    params['nhiduplayer_tune'] = int(config1['nhiduplayer_tune'][np.random.random_integers(0,len(config1['nhiduplayer_tune'])-1)])
   else:
-    params['dropout_tune'] = float(config['dropout_tune'])
+    params['nhiduplayer_tune'] = int(config1['nhiduplayer_tune'])
+  
+  if isinstance(config1['dropout_tune'], list) is True:
+    params['dropout_tune'] = float(config1['dropout_tune'][np.random.random_integers(0,len(config1['dropout_tune'])-1)])
+  else:
+    params['dropout_tune'] = float(config1['dropout_tune'])
 
-  if isinstance(config['recactlayer_tune'], list) is True:
-    params['recactlayer_tune'] = str(config['recactlayer_tune'][np.random.random_integers(0,len(config['recactlayer_tune'])-1)])
+  if isinstance(config1['recactlayer_tune'], list) is True:
+    params['recactlayer_tune'] = str(config1['recactlayer_tune'][np.random.random_integers(0,len(config1['recactlayer_tune'])-1)])
   else:
-    params['recactlayer_tune'] = str(config['recactlayer_tune'])
+    params['recactlayer_tune'] = str(config1['recactlayer_tune'])
   
   temp = []
   temp1 = []
@@ -174,28 +177,28 @@ def get_random_hyperparameterset(config):
     temp2.append(params['dropout_tune'])
     temp3.append(params['recactlayer_tune'])
   
-  config['neuronsperlayer'] = temp1
-  config['activationperlayer'] = temp
-  config['dropout'] = temp2
-  config['recurrentactivation'] = temp3
-  config['learningrate'] = float(config['lr_tune'][np.random.random_integers(0,len(config['lr_tune'])-1)])
-  config['batchsize'] = int(config['batchsize_tune'][np.random.random_integers(0,len(config['batchsize_tune'])-1)])
-  config['batchnorm'] = str(config['batchnorm_tune'][np.random.random_integers(0,len(config['batchnorm_tune'])-1)])
+  config1['neuronsperlayer'] = temp1
+  config1['activationperlayer'] = temp
+  config1['dropout'] = temp2
+  config1['recurrentactivation'] = temp3
+  config1['learningrate'] = float(config1['lr_tune'][np.random.random_integers(0,len(config1['lr_tune'])-1)])
+  config1['batchsize'] = int(config1['batchsize_tune'][np.random.random_integers(0,len(config1['batchsize_tune'])-1)])
+  config1['batchnorm'] = str(config1['batchnorm_tune'][np.random.random_integers(0,len(config1['batchnorm_tune'])-1)])
   
-  #print config['neuronsperlayer']
-  #print config['activationperlayer']
-  #print config['dropout']
-  #print config['learningrate']
-  #print config['batchsize']
-  #print config['batchnorm']
+  #print config1['neuronsperlayer']
+  #print config1['activationperlayer']
+  #print config1['dropout']
+  #print config1['learningrate']
+  #print config1['batchsize']
+  #print config1['batchnorm']
   
-  return config
+  return config1
 
 ###############################################
 
 def run_nn(epochs, temp_config, X_train, Y_train):
   '''builds and the runs the specified model, after that it returns the last loss'''
-  print temp_config['neuronsperlayer']
+  #print temp_config['neuronsperlayer']
   model = build_model(temp_config)
   
   hist = model.fit(X_train, Y_train, epochs=epochs, batch_size=int(temp_config['batchsize']), verbose=0)
@@ -210,7 +213,7 @@ def write_params(params, filename):
   '''writes the dictionary defined in params to a file'''
   
   with open(filename, 'w') as f:
-    for key, value in config.items():
+    for key, value in params.items():
       f.write('%s: %s\n' % (key, value))
       
 ###############################################
@@ -221,7 +224,7 @@ def hypertune(X_train, Y_train, config):
   start = time.time()
   print '> hyperparameter tuning through the hyperband algorithm will be done'
   
-  max_iter = 2000  # maximum iterations/epochs per configuration
+  max_iter = 103  # maximum iterations/epochs per configuration
   eta = 3 # defines downsampling rate (default=3)
   logeta = lambda x: np.log(x)/np.log(eta)
   s_max = int(logeta(max_iter))  # number of unique executions of Successive Halving (minus one)
@@ -229,22 +232,30 @@ def hypertune(X_train, Y_train, config):
 
   #### Begin Finite Horizon Hyperband outerloop. Repeat indefinetely.
   for s in reversed(range(s_max+1)):
-    print 'halving :', s
+
     n = int(np.ceil(B/max_iter/(s+1)*eta**s)) # initial number of configurations
     r = max_iter*eta**(-s) # initial number of iterations to run configurations for
 
     #### Begin Finite Horizon Successive Halving with (n,r)
+    
     T = [ get_random_hyperparameterset(config) for i in range(n) ]
+    #print T
     for i in range(s+1):
       # Run each of the n_i configs for r_i iterations and keep best n_i/eta
       n_i = n*eta**(-i)
       r_i = r*eta**(i)
+      print 'keep best: ', n_i
+      print 'number of epochs: ', int(r_i)
+      print 'number of configs: ', len(T)
+      #for t in T:
+      #  print t
       val_losses = [ run_nn(int(r_i), t, X_train, Y_train) for t in T ]
       T = [ T[i] for i in np.argsort(val_losses)[0:int( n_i/eta )] ]
   
   
   filename = str(config['bestparams'])
   write_params(T[0], filename)
+  print np.argsort(val_losses)[0:int( n_i/eta )]
   
   print '> hyperparameter tuning took : ', time.time() - start
     
