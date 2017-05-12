@@ -244,7 +244,7 @@ def hypertune(X_train, Y_train, config):
       # Run each of the n_i configs for r_i iterations and keep best n_i/eta
       n_i = n*eta**(-i)
       r_i = r*eta**(i)
-      print 'keep best: ', n_i
+      print 'keep best: ', n_i/eta
       print 'number of epochs: ', int(r_i)
       print 'number of configs: ', len(T)
       #for t in T:
