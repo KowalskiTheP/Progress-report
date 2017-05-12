@@ -41,51 +41,59 @@ else:
 
 print '> Data loaded! This took: ', time.time() - loadData_start_time, 'seconds'
 
-# build the specified model
-model1 = model.build_model(config)
+if config['tuning'] == 'on':
+  
+  #config = model.get_random_hyperparameterset(config)
+  model.hypertune(x_winTrain, y_winTrain, config)
+  sys.exit()
 
-# train the model
-model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
-
-# simple predictions or eval metrics
-y_winTest = y_winTest.flatten()
-y_winTrain = y_winTrain.flatten()
-
-if config['evalmetrics'] == 'on':
-  predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
-  predTrain = model.eval_model(x_winTrain, y_winTrain, model1, config, 'train data')
 else:
-  predTest = model.predict_point_by_point(model1, x_winTest)
-  predTrain = model.predict_point_by_point(model1, x_winTrain)
-  print np.column_stack((pred, y_winTest))
   
-
-if config['normalise'] == '1':
-  predTest = scaler.inverse_transform(predTest)
-  y_winTest = scaler.inverse_transform(y_winTest)
-  y_winTrain = scaler.inverse_transform(y_winTrain)
-  predTrain = scaler.inverse_transform(predTrain)
-
-if config['normalise'] == '2':
-  refValue = float(config['refvalue'])
-  predTest = loadData.denormalise_data_refValue(refValue,predTest)
-  y_winTest = loadData.denormalise_data_refValue(refValue,y_winTest)
-  y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
-  predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
+  # build the specified model
+  model1 = model.build_model(config)
   
-if config['normalise'] == '3':
-  for i in range(len(testRef)):
-    predTest[i] = testRef[i]*predTest[i]
-    y_winTest[i] = testRef[i]*y_winTest[i]
-  for i in range(len(trainRef)):
-    y_winTrain[i] = trainRef[i]*y_winTrain[i]
-    predTrain[i] = trainRef[i]*predTrain[i]
+  # train the model
+  model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
   
-      
-if config['plotting'] == 'on':
-  model.plot_data(y_winTrain, predTrain)
-  model.plot_data(y_winTest, predTest)
-  model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
+  # simple predictions or eval metrics
+  y_winTest = y_winTest.flatten()
+  y_winTrain = y_winTrain.flatten()
+  
+  if config['evalmetrics'] == 'on':
+    predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
+    predTrain = model.eval_model(x_winTrain, y_winTrain, model1, config, 'train data')
+  else:
+    predTest = model.predict_point_by_point(model1, x_winTest)
+    predTrain = model.predict_point_by_point(model1, x_winTrain)
+    print np.column_stack((pred, y_winTest))
+    
+  
+  if config['normalise'] == '1':
+    predTest = scaler.inverse_transform(predTest)
+    y_winTest = scaler.inverse_transform(y_winTest)
+    y_winTrain = scaler.inverse_transform(y_winTrain)
+    predTrain = scaler.inverse_transform(predTrain)
+  
+  if config['normalise'] == '2':
+    refValue = float(config['refvalue'])
+    predTest = loadData.denormalise_data_refValue(refValue,predTest)
+    y_winTest = loadData.denormalise_data_refValue(refValue,y_winTest)
+    y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
+    predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
+    
+  if config['normalise'] == '3':
+    for i in range(len(testRef)):
+      predTest[i] = testRef[i]*predTest[i]
+      y_winTest[i] = testRef[i]*y_winTest[i]
+    for i in range(len(trainRef)):
+      y_winTrain[i] = trainRef[i]*y_winTrain[i]
+      predTrain[i] = trainRef[i]*predTrain[i]
+    
+        
+  if config['plotting'] == 'on':
+    model.plot_data(y_winTrain, predTrain)
+    model.plot_data(y_winTest, predTest)
+    model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
  
 
 
