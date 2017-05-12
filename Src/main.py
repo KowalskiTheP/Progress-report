@@ -18,7 +18,8 @@ global_start_time = time.time()
 loadData_start_time = time.time()
 print '> Loading data... '
   
-dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['header']), config['datecolumn'])
+#dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['header']), config['datecolumn'])
+dataframe = loadData.load_fromCSV(config['csvfile'], '.', ',', int(config['header']), config['datecolumn'])
 
 if config['windoweddata'] == 'on':
   
@@ -32,7 +33,8 @@ if config['windoweddata'] == 'on':
     x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
     
   if config['normalise'] == '3':
-    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
+    #x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = #loadData.make_windowed_data_normOnWin(dataframe,config)
+    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin_DaxNikkeiDow(dataframe,config)
     print 'len(x_winTest): ', len(x_winTest)
     print 'len(y_winTest): ', len(y_winTest)
 

@@ -10,6 +10,7 @@ import sys
 ## If no date is aviable, dataColumn has to be 'None'
 def load_fromCSV(csvFile, decimal , seperator, header, dateColumn):
   df=pd.read_csv(csvFile, decimal=decimal ,sep=seperator, header=header)
+
   if dateColumn != 'None':
     ## Some definitions and initialisation
     refdate = '01.01.1960'
@@ -204,6 +205,45 @@ def make_windowed_data_normOnWin(dataframe, config):
   y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,yDim ))
   
   return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
+
+#######################
+
+def make_windowed_data_normOnWin_DaxNikkeiDow(dataframe, config):
+  print dataframe
+  refValue = float(config['refvalue'])
+  winL = int(config['winlength'])
+  lookB = int(config['look_back'])
+  xDim = len(config['columns'])
+  yDim = int(config['outputdim'])
+  dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
+  #dataSet_Full = getDataSet_noSplit_seq(dataframe, config['columns'])
+  dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
+  #x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain, winL, lookB,yDim)
+  #x_winTest, y_winTest = get_windows_andShift(dataSetTest, winL, lookB,yDim)
+  x_winTrain, y_winTrain = get_windows_andShift_seq(dataSetTrain, winL, lookB,yDim)
+  x_winTest, y_winTest = get_windows_andShift_seq(dataSetTest, winL, lookB,yDim)
+  
+  print 'x_winTrain:\n', x_winTrain
+  print 'y_winTrain:\n', y_winTrain
+  
+  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
+  for i in range(len(y_winTrain)):
+    x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
+    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,-1],y_winTrain[i]))
+    trainRef.append(x_winTrain[i,-1])
+  for i in range(len(y_winTest)):
+    x_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
+    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1,-1],y_winTest[i]))
+    testRef.append(x_winTest[i,-1])
+    
+  x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
+  y_winTrain_norm = np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),yDim ))
+  x_winTest_norm =  np.reshape(np.array(x_winTest_norm) ,(len(x_winTest_norm) ,winL,xDim ))
+  y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,yDim ))
+  
+  return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
+
+
 
 ## Following lines were used to test the functions  
 
