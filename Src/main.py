@@ -61,8 +61,8 @@ else:
   model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
   
   # simple predictions or eval metrics
-y_winTest = y_winTest.flatten()
-y_winTrain = y_winTrain.flatten()
+  y_winTest = y_winTest.flatten()
+  y_winTrain = y_winTrain.flatten()
 
   
   if config['evalmetrics'] == 'on':
@@ -88,13 +88,13 @@ y_winTrain = y_winTrain.flatten()
     predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
     
   if config['normalise'] == '3':
-  print trainRef
+    print trainRef
     for i in range(len(testRef)):
-    predTest[i] = testRef[i]*predTest[i]
-    y_winTest[i] = testRef[i]*y_winTest[i]
+      predTest[i] = testRef[i]*predTest[i]
+      y_winTest[i] = testRef[i]*y_winTest[i]
     for i in range(len(trainRef)):
-    y_winTrain[i] = trainRef[i]*y_winTrain[i]
-    predTrain[i] = trainRef[i]*predTrain[i]
+      y_winTrain[i] = trainRef[i]*y_winTrain[i]
+      predTrain[i] = trainRef[i]*predTrain[i]
     
 
 yDim = int(config['outputdim'])
@@ -121,7 +121,7 @@ diffTrain = np.sqrt((predTest - y_winTest)**2)
 print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
 print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
         
-  if config['plotting'] == 'on':
+if config['plotting'] == 'on':
   model.plot_data(y_winTrain, predTrain)
   model.plot_data(y_winTest, predTest)
   model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
