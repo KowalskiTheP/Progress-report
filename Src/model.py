@@ -20,53 +20,76 @@ def build_model(params):
   
   # build sequential model
   model = Sequential()
-
+  print len(params['neuronsperlayer'])
+  print params['neuronsperlayer']
   # first layer is special, gets build by hand
-  if int(params['verbosity']) < 2:
-    print 'layer 0: ',params['neuronsperlayer'][0]
-  model.add(LSTM(
-    int(params['neuronsperlayer'][0]),
-    input_shape = (None, int(params['inputdim'])),
-    activation = str(params['activationperlayer'][0]),
-    return_sequences=True,
-    recurrent_activation = str(params['recurrentactivation'][0])
-    )
-  )
-  if str(params['batchnorm']) == 'on':
-    model.add(BatchNormalization())
-  
-  model.add(Dropout(float(params['dropout'][0])))
-
-  # all interims layer get done by this for loop
-  for i in xrange(1,len(params['neuronsperlayer'])-1):
+  if isinstance(params['neuronsperlayer'], list):
+      
     if int(params['verbosity']) < 2:
-      print 'layer ', i, ':', params['neuronsperlayer'][i]
-    
+      print 'layer 0: ',params['neuronsperlayer'][0]
     model.add(LSTM(
-      int(params['neuronsperlayer'][i]),
-      activation = str(params['activationperlayer'][i]),
+      int(params['neuronsperlayer'][0]),
+      input_shape = (None, int(params['inputdim'])),
+      activation = str(params['activationperlayer'][0]),
       return_sequences=True,
-      recurrent_activation = str(params['recurrentactivation'][i])
+      recurrent_activation = str(params['recurrentactivation'][0])
       )
     )
     if str(params['batchnorm']) == 'on':
       model.add(BatchNormalization())
-
-    model.add(Dropout(float(params['dropout'][i])))
+    
+    model.add(Dropout(float(params['dropout'][0])))
   
-  #last LSTM layer is special because return_sequences=False
-  if int(params['verbosity']) < 2:
-    print 'last LSTM layer: ',params['neuronsperlayer'][-1]
-  model.add(LSTM(
-    int(params['neuronsperlayer'][-1]),
-    activation = str(params['activationperlayer'][-1]),
-    return_sequences=False,
-    recurrent_activation = str(params['recurrentactivation'][-1])
+    # all interims layer get done by this for loop
+    for i in xrange(1,len(params['neuronsperlayer'])-1):
+      if int(params['verbosity']) < 2:
+        print 'layer ', i, ':', params['neuronsperlayer'][i]
+      
+      model.add(LSTM(
+        int(params['neuronsperlayer'][i]),
+        activation = str(params['activationperlayer'][i]),
+        return_sequences=True,
+        recurrent_activation = str(params['recurrentactivation'][i])
+        )
+      )
+      if str(params['batchnorm']) == 'on':
+        model.add(BatchNormalization())
+  
+      model.add(Dropout(float(params['dropout'][i])))
+    
+    #last LSTM layer is special because return_sequences=False
+    if int(params['verbosity']) < 2:
+      print 'last LSTM layer: ',params['neuronsperlayer'][-1]
+    model.add(LSTM(
+      int(params['neuronsperlayer'][-1]),
+      activation = str(params['activationperlayer'][-1]),
+      return_sequences=False,
+      recurrent_activation = str(params['recurrentactivation'][-1])
+      )
     )
-  )
-  if str(params['batchnorm']) == 'on':
-    model.add(BatchNormalization())
-  model.add(Dropout(float(params['dropout'][-1])))
+    if str(params['batchnorm']) == 'on':
+      model.add(BatchNormalization())
+    model.add(Dropout(float(params['dropout'][-1])))
+  
+  else:
+    print params['neuronsperlayer']
+    print int(params['inputdim'])
+    print str(params['activationperlayer'])
+    print str(params['recurrentactivation'])
+    if int(params['verbosity']) < 2:
+      print 'layer 0: ',params['neuronsperlayer']
+    model.add(LSTM(
+      int(params['neuronsperlayer']),
+      input_shape = (None, int(params['inputdim'])),
+      activation = str(params['activationperlayer']),
+      return_sequences=False,
+      recurrent_activation = str(params['recurrentactivation'])
+      )
+    )
+    if str(params['batchnorm']) == 'on':
+      model.add(BatchNormalization())
+    
+    model.add(Dropout(float(params['dropout'][0])))
   
   #last layer is dense
   if int(params['verbosity']) < 2:
@@ -86,7 +109,7 @@ def build_model(params):
                  decay=float(params['decay']),
                  )
   model.compile(loss=params['loss'], optimizer=opt)
-  
+  model.summary()
   if int(params['verbosity']) < 2:
     print '> Compilation Time : ', time.time() - start
   return model

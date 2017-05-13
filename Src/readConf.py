@@ -39,35 +39,38 @@ def readINI(filename):
       configfileArgs[name] = value.split(',')
   #print configfileArgs
   
-  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['activationperlayer'], list):
+  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['activationperlayer'], list) and isinstance    (configfileArgs['neuronsperlayer'], list) == True:
     if len(configfileArgs['neuronsperlayer']) != len(configfileArgs['activationperlayer']):
       print 'number of activation functions has to be: 1 or equal to the length of neuronsPerLayer'
       sys.exit()
   else:
-    temp_list1 = []
-    for item in configfileArgs['neuronsperlayer']:
-      temp_list1.append(configfileArgs['activationperlayer'])
-    configfileArgs['activationperlayer'] = temp_list1
+    if  isinstance(configfileArgs['neuronsperlayer'], list) == True:
+      temp_list1 = []
+      for item in configfileArgs['neuronsperlayer']:
+        temp_list1.append(configfileArgs['activationperlayer'])
+      configfileArgs['activationperlayer'] = temp_list1
 
-  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['recurrentactivation'], list):
+  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['recurrentactivation'], list) and isinstance    (configfileArgs['neuronsperlayer'], list) == True:
     if len(configfileArgs['neuronsperlayer']) != len(configfileArgs['recurrentactivation']):
       print 'number of recurrent activation functions has to be: 1 or equal to the length of neuronsPerLayer'
       sys.exit()
   else:
-    temp_list1 = []
-    for item in configfileArgs['neuronsperlayer']:
-      temp_list1.append(configfileArgs['recurrentactivation'])
-    configfileArgs['recurrentactivation'] = temp_list1    
+    if  isinstance(configfileArgs['neuronsperlayer'], list) == True:    
+      temp_list1 = []
+      for item in configfileArgs['neuronsperlayer']:
+        temp_list1.append(configfileArgs['recurrentactivation'])
+      configfileArgs['recurrentactivation'] = temp_list1    
   
-  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['dropout'], list):
+  if isinstance(configfileArgs['neuronsperlayer'], list) == isinstance(configfileArgs['dropout'], list) and isinstance    (configfileArgs['neuronsperlayer'], list) == True:
     if len(configfileArgs['neuronsperlayer']) != len(configfileArgs['dropout']):
       print 'number of dropout has to be: 1 or equal to the length of neuronsPerLayer'
       sys.exit()
   else:
-    temp_list1 = []
-    for item in configfileArgs['neuronsperlayer']:
-      temp_list1.append(configfileArgs['dropout'])
-    configfileArgs['dropout'] = temp_list1
+   if  isinstance(configfileArgs['neuronsperlayer'], list) == True:    
+     temp_list1 = []
+     for item in configfileArgs['neuronsperlayer']:
+       temp_list1.append(configfileArgs['dropout'])
+     configfileArgs['dropout'] = temp_list1
   
   pp = pprint.PrettyPrinter(indent=2)
   pp.pprint(configfileArgs)
