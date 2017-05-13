@@ -18,7 +18,8 @@ global_start_time = time.time()
 loadData_start_time = time.time()
 print '> Loading data... '
   
-dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['header']), config['datecolumn'])
+#dataframe = loadData.load_fromCSV(config['csvfile'], ',', ';', int(config['header']), config['datecolumn'])
+dataframe = loadData.load_fromCSV(config['csvfile'], '.', ',', int(config['header']), config['datecolumn'])
 
 if config['windoweddata'] == 'on':
   
@@ -32,8 +33,12 @@ if config['windoweddata'] == 'on':
     x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
     
   if config['normalise'] == '3':
-    print 'puhhhhhhhhhhhhhhhhhhhhhhhhhh'
-    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin(dataframe,config)
+    #x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = #loadData.make_windowed_data_normOnWin(dataframe,config)
+    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin_DaxNikkeiDow(dataframe,config)
+    print 'len(x_winTest): ', len(x_winTest)
+    print 'len(y_winTest): ', len(y_winTest)
+
+    
 
 else:
   print 'not implemented so far, exiting!'
@@ -56,8 +61,9 @@ else:
   model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
   
   # simple predictions or eval metrics
-  y_winTest = y_winTest.flatten()
-  y_winTrain = y_winTrain.flatten()
+y_winTest = y_winTest.flatten()
+y_winTrain = y_winTrain.flatten()
+
   
   if config['evalmetrics'] == 'on':
     predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
@@ -82,18 +88,43 @@ else:
     predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
     
   if config['normalise'] == '3':
+  print trainRef
     for i in range(len(testRef)):
-      predTest[i] = testRef[i]*predTest[i]
-      y_winTest[i] = testRef[i]*y_winTest[i]
+    predTest[i] = testRef[i]*predTest[i]
+    y_winTest[i] = testRef[i]*y_winTest[i]
     for i in range(len(trainRef)):
-      y_winTrain[i] = trainRef[i]*y_winTrain[i]
-      predTrain[i] = trainRef[i]*predTrain[i]
+    y_winTrain[i] = trainRef[i]*y_winTrain[i]
+    predTrain[i] = trainRef[i]*predTrain[i]
     
+
+yDim = int(config['outputdim'])
+# If the y-dimension is bigger then one, some additional mambo jambo 
+# has to be done to get corresponding y and ^y values
+if yDim > 1:
+  predTrain = np.reshape(predTrain,(len(y_winTrain),yDim))
+  l = list(range(0, yDim-1))
+  lback = list(range((len(y_winTest)-yDim+1),len(y_winTest)))
+  lfull = l + lback
+  y_winTest = np.delete(y_winTest, lfull, 0)
+  y_winTest = np.delete(y_winTest, l, 1)
+  y_winTest = y_winTest.flatten()
+  tmpPredTest = []
+  tmpPredTest_test = []
+  for i in range(len(y_winTest)):
+    tmpY = 0.
+    for j in range(yDim):
+      tmpY = tmpY + predTest[i+j,yDim-1-j]
+    tmpPredTest.append(tmpY/yDim)
+  predTest = np.array(tmpPredTest)
+
+diffTrain = np.sqrt((predTest - y_winTest)**2)
+print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
+print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
         
   if config['plotting'] == 'on':
-    model.plot_data(y_winTrain, predTrain)
-    model.plot_data(y_winTest, predTest)
-    model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
+  model.plot_data(y_winTrain, predTrain)
+  model.plot_data(y_winTest, predTest)
+  model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
  
 
 
