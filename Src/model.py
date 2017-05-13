@@ -20,8 +20,8 @@ def build_model(params):
   
   # build sequential model
   model = Sequential()
-  print len(params['neuronsperlayer'])
-  print params['neuronsperlayer']
+  #print len(params['neuronsperlayer'])
+  #print params['neuronsperlayer']
   # first layer is special, gets build by hand
   if isinstance(params['neuronsperlayer'], list):
       
@@ -102,6 +102,7 @@ def build_model(params):
   
   if int(params['verbosity']) < 2:
     print '> Build time : ', time.time() - start
+    model.summary()
   
   start = time.time()
   if params['optimiser'] == 'adam':
@@ -109,7 +110,7 @@ def build_model(params):
                  decay=float(params['decay']),
                  )
   model.compile(loss=params['loss'], optimizer=opt)
-  model.summary()
+  
   if int(params['verbosity']) < 2:
     print '> Compilation Time : ', time.time() - start
   return model
@@ -226,6 +227,12 @@ def run_nn(epochs, temp_config, X_train, Y_train):
   #print temp_config['neuronsperlayer']
   model = build_model(temp_config)
   
+  print '*****'
+  print temp_config['neuronsperlayer']
+  print temp_config['activationperlayer']
+  print temp_config['dropout']
+  print '*****'
+  
   hist = model.fit(X_train, Y_train, epochs=epochs, batch_size=int(temp_config['batchsize']), verbose=0)
   
   last_loss = hist.history['loss'][-1]
@@ -246,10 +253,12 @@ def write_params(params, filename):
 def hypertune(X_train, Y_train, config):
   '''hyperband algorithm adapted from https://people.eecs.berkeley.edu/~kjamieson/hyperband.html'''
   
+  history_list = []
+  
   start = time.time()
   print '> hyperparameter tuning through the hyperband algorithm will be done'
   
-  max_iter = 81  # maximum iterations/epochs per configuration
+  max_iter = 21  # maximum iterations/epochs per configuration
   eta = 3 # defines downsampling rate (default=3)
   logeta = lambda x: np.log(x)/np.log(eta)
   s_max = int(logeta(max_iter))  # number of unique executions of Successive Halving (minus one)
@@ -269,18 +278,25 @@ def hypertune(X_train, Y_train, config):
       # Run each of the n_i configs for r_i iterations and keep best n_i/eta
       n_i = n*eta**(-i)
       r_i = r*eta**(i)
+      print '######################################'
       print 'keep best: ', n_i/eta
       print 'number of epochs: ', int(r_i)
       print 'number of configs: ', len(T)
+      print '######################################'
       #for t in T:
       #  print t
       val_losses = [ run_nn(int(r_i), t, X_train, Y_train) for t in T ]
       T = [ T[i] for i in np.argsort(val_losses)[0:int( n_i/eta )] ]
+    
+    print np.argsort(val_losses)[0:int( n_i/eta )]
+    history_list.append(T)
+    print history_list
   
   
   filename = str(config['bestparams'])
   write_params(T[0], filename)
   print np.argsort(val_losses)[0:int( n_i/eta )]
+  print history_list
   
   print '> hyperparameter tuning took : ', time.time() - start
     
