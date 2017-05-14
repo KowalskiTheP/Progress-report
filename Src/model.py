@@ -112,9 +112,10 @@ def plot_data(true_data, pred_data, title='Your data'):
 
 def eval_model(test_x, test_y, trainedModel, config, tableHeader):
     '''calculate some core metrics for model evaluation'''
-    
+    test_y_shape = test_y.shape
     score = trainedModel.evaluate(test_x, test_y, batch_size=int(config['batchsize']))
     pred = predict_point_by_point(trainedModel, test_x)
+    test_y = test_y.flatten()
     rp, rp_P = stats.pearsonr(pred,test_y)
     rs, rs_P = stats.spearmanr(pred,test_y)
     sd = np.std(pred-test_y)
@@ -122,7 +123,7 @@ def eval_model(test_x, test_y, trainedModel, config, tableHeader):
     print tabulate({"metric": ['test loss', 'Rp', 'Rs', 'SD'],"model": [score, rp, rs, sd]}, headers="keys", tablefmt="orgtbl")
     np.savetxt(config['predictionfile'], np.column_stack((pred, test_y)), delimiter=' ')
     
-    return pred
+    return np.reshape(pred,test_y_shape)
     
     
     
