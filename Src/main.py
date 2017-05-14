@@ -35,10 +35,6 @@ if config['windoweddata'] == 'on':
   if config['normalise'] == '3':
     #x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = #loadData.make_windowed_data_normOnWin(dataframe,config)
     x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin_DaxNikkeiDow(dataframe,config)
-    print 'len(x_winTest): ', len(x_winTest)
-    print 'len(y_winTest): ', len(y_winTest)
-
-    
 
 else:
   print 'not implemented so far, exiting!'
@@ -80,19 +76,21 @@ if config['normalise'] == '2':
   predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
   
 if config['normalise'] == '3':
-  print trainRef
+  y_column = int(config['y_column'])
+  y_column = int(config['y_column'])
   for i in range(len(testRef)):
-    predTest[i] = testRef[i,-1]*predTest[i]
-    y_winTest[i] = testRef[i,-1]*y_winTest[i]
+    predTest[i] = testRef[i,y_column]*predTest[i]
+    y_winTest[i] = testRef[i,y_column]*y_winTest[i]
   for i in range(len(trainRef)):
-    y_winTrain[i] = trainRef[i,-1]*y_winTrain[i]
-    predTrain[i] = trainRef[i,-1]*predTrain[i]
+    y_winTrain[i] = trainRef[i,y_column]*y_winTrain[i]
+    predTrain[i] = trainRef[i,y_column]*predTrain[i]
     
 
 yDim = int(config['outputdim'])
 # If the y-dimension is bigger then one, some additional mambo jambo 
 # has to be done to get corresponding y and ^y values
 if yDim > 1:
+  print 'y dimension is bigger then 1'
   predTrain = np.reshape(predTrain,(len(y_winTrain),yDim))
   l = list(range(0, yDim-1))
   lback = list(range((len(y_winTest)-yDim+1),len(y_winTest)))
@@ -109,9 +107,13 @@ if yDim > 1:
     tmpPredTest.append(tmpY/yDim)
   predTest = np.array(tmpPredTest)
 
+
 diffTrain = np.sqrt((predTest - y_winTest)**2)
 print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
 print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
+
+print 'y_winTest[-20:-1]:\n', y_winTest[-20:-1]
+print 'predTest[-20:-1]:\n', predTest[-20:-1]
       
 if config['plotting'] == 'on':
 #  model.plot_data(y_winTrain, predTrain)

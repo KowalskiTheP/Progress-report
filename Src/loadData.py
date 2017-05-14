@@ -147,12 +147,11 @@ def get_windows_andShift(x,winLength,look_back,outDim):
 
 ###############################################
 
-def get_windows_andShift_seq(x,winLength,look_back,outDim):
+def get_windows_andShift_seq(x,winLength,look_back,outDim,y_column):
   x_train, y_train = [], []
   for i in xrange(0,len(x)-(winLength+outDim),2):
     x_train.append(x[i:i+winLength])
-    y_train.append(x[(i+winLength+look_back-1):(i+winLength+look_back+outDim-1),-1])
-  print np.array(y_train)
+    y_train.append(x[(i+winLength+look_back-1):(i+winLength+look_back+outDim-1),y_column])
   return np.array(x_train), np.reshape(np.array(y_train),(len(y_train),outDim))
 
 ###############################################
@@ -209,31 +208,30 @@ def make_windowed_data_normOnWin(dataframe, config):
 #######################
 
 def make_windowed_data_normOnWin_DaxNikkeiDow(dataframe, config):
-  print dataframe
+
   refValue = float(config['refvalue'])
   winL = int(config['winlength'])
   lookB = int(config['look_back'])
   xDim = len(config['columns'])
   yDim = int(config['outputdim'])
+  y_column = int(config['y_column'])
   dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
   #dataSet_Full = getDataSet_noSplit_seq(dataframe, config['columns'])
   dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
   #x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain, winL, lookB,yDim)
   #x_winTest, y_winTest = get_windows_andShift(dataSetTest, winL, lookB,yDim)
-  x_winTrain, y_winTrain = get_windows_andShift_seq(dataSetTrain, winL, lookB,yDim)
-  x_winTest, y_winTest = get_windows_andShift_seq(dataSetTest, winL, lookB,yDim)
-  
-  print 'x_winTrain:\n', x_winTrain
-  print 'y_winTrain:\n', y_winTrain
+  x_winTrain, y_winTrain = get_windows_andShift_seq(dataSetTrain, winL, lookB,yDim,y_column)
+  x_winTest, y_winTest = get_windows_andShift_seq(dataSetTest, winL, lookB,yDim,y_column)
+
   
   x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
   for i in range(len(y_winTrain)):
     x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
-    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,-1],y_winTrain[i]))
+    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,y_column],y_winTrain[i]))
     trainRef.append(x_winTrain[i,-1])
   for i in range(len(y_winTest)):
     x_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
-    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1,-1],y_winTest[i]))
+    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1,y_column],y_winTest[i]))
     testRef.append(x_winTest[i,-1])
     
   x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
@@ -244,15 +242,4 @@ def make_windowed_data_normOnWin_DaxNikkeiDow(dataframe, config):
   return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
 
 
-
-## Following lines were used to test the functions  
-
-#dataframe = load_fromCSV('../Data/dax_19700105_20170428.csv', ',', ';', 0,'Datum')
-#print dataframe
-#dataSet = getDataSet(dataframe, [4])
-#x_full, y_full = shiftData(dataSet, 1)
-#x_win, y_win = get_windows(x_full,y_full,10)
-
-#print 'x: ',x_win[-3:-1]
-#print 'y: ',y_win[-3:-1]
 

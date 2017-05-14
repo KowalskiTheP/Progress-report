@@ -22,7 +22,6 @@ def reoder(dataframe, columns):
     dataSet[i+1,0] = dataframe.iloc[j,0]
     dataSet[i+1,1] = dataframe.iloc[j,columns[1]]
     j=j+1
-  print 'Data np.array:\n', dataSet, '\n'
   return dataSet
 
 df_dax = pd.read_csv('../Data/dax_19700105_20170428.csv', decimal=',' ,sep=';', header=0)
@@ -52,7 +51,6 @@ array_dax = reoder(df_dax, [1,2])
 array_nikkei = reoder(df_nikkei, [1,2])
 array_dowJones = reoder(df_dowJones, [1,2])
 
-print 'array_nikkei:\n', array_nikkei
 
 for i in range(len(array_dax)):
   if array_dax[i,0]!=array_nikkei[i,0] or array_dax[i,0]!=array_dowJones[i,0] or array_dowJones[i,0]!=array_nikkei[i,0]:
@@ -63,10 +61,14 @@ df_dax = pd.DataFrame(data=array_dax, columns=['days','stock'])
 df_nikkei = pd.DataFrame(data=array_nikkei, columns=['days','stock'])
 df_dowJones = pd.DataFrame(data=array_dowJones, columns=['days','stock'])
 
-print 'df_nikkei:\n', df_nikkei
+df_nikkei = df_nikkei.drop(df_nikkei.index[[0]])
+df_nikkei = df_nikkei.reset_index(drop=True)
+print 'df_nikkei:\n', df_nikkei.shift(periods=1, freq=None, axis=0)
 
 df_combi = pd.concat([df_dax, df_nikkei['stock']], axis=1, join_axes=[df_dax.index])
 df_combi = pd.concat([df_combi, df_dowJones['stock']], axis=1, join_axes=[df_combi.index])
+
+df_combi = df_combi.drop(df_combi.index[[14988,14989]])
 
 df_combi.to_csv('../Data/combi_dax_nikkei_dowJones.csv',index=False)
 print df_combi
