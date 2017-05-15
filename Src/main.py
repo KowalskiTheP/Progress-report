@@ -125,7 +125,7 @@ print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
 if config['plotting'] == 'on':
   model.plot_data(y_winTrain, predTrain)
   model.plot_data(y_winTest, predTest)
-  model.plot_data(y_winTest[-10:-1], predTest[-10:-1])
+  model.plot_data(y_winTest[-100:-1], predTest[-100:-1])
  
 
 
