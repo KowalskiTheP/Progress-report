@@ -1,6 +1,14 @@
 import numpy as np 
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
+
+
+import readConf
+import numpy as np
+
+config = readConf.readINI("../Data/config.conf")
+winLength = int(config['winlength'])
+
 
 def convertDate(df, dateColumn, date_format, refdate ):
   date_list = []
@@ -24,6 +32,19 @@ def reoder(dataframe, columns):
     j=j+1
   return dataSet
 
+def selectRange(dateToPred, refdate, date_format, dataFormatedDate):
+  a = datetime.strptime(dateToPred, date_format)
+  b = datetime.strptime(refdate, date_format)
+  c = str(a-b)
+  c = [int(s) for s in c.split() if s.isdigit() ]
+#  lowerBound = str(c - timedelta(days=np.ceil(winLength / 2) ))
+#  lowerBound = [int(s) for s in lowerBound.split() if s.isdigit() ]
+  for i in range(len(dataFormatedDate)):
+    if dataFormatedDate.loc[i,'days'] == c:
+#      dataFormatedDate.drop(i, axis=0,inplace=True)
+      newdf = dataFormatedDate.loc[i-np.ceil(winLength / 2):i]
+  return newdf
+
 ###############################################################################################
 
 df_dax = pd.read_csv('../Data/dax_predWin.csv', decimal='.' ,sep=',', header=0)
@@ -38,6 +59,10 @@ df_dax = convertDate(df_dax, 'Date', '%Y-%m-%d', '1985-01-01')
 df_nikkei = convertDate(df_nikkei, 'Date', '%Y-%m-%d', '1985-01-01')
 df_dowJones = convertDate(df_dowJones, 'Date', '%Y-%m-%d', '1985-01-01')
 
+print 'dax ',df_dax
+df_dax = selectRange('2017-05-12', '1985-01-01','%Y-%m-%d' , df_dax)
+print 'dax neu ', df_dax
+
 df_combi = pd.merge(left=df_dax, right=df_nikkei, on='days')
 df_combi = pd.merge(left=df_combi, right=df_dowJones, on='days')
 print df_combi
@@ -45,6 +70,9 @@ print df_combi
 df_dax = df_combi.loc[:,['days','Open_x','Close_x']]
 df_nikkei = df_combi.loc[:,['days','Open_y','Close_y']]
 df_dowJones = df_combi.loc[:,['days','Open','Close']]
+
+
+
 
 array_dax = reoder(df_dax, [1,2])
 
