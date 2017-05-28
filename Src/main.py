@@ -1,7 +1,6 @@
 import readConf
 import model
 import loadData
-
 import os
 import time
 import numpy as np
@@ -56,18 +55,21 @@ else:
   # train the model
   model1.fit(x_winTrain, y_winTrain, int(config['batchsize']), int(config['epochs']))
   
+  jsonFile = str(config['jsonfile'])
+  modelFile = str(config['modelfile'])
+  model.safe_model(model1, jsonFile, modelFile)
+  loaded_model = model.load_model(jsonFile, modelFile)
+
   # simple predictions or eval metrics
   y_winTest = y_winTest.flatten()
   y_winTrain = y_winTrain.flatten()
 
-  
-
   if config['evalmetrics'] == 'on':
-    predTest = model.eval_model(x_winTest, y_winTest, model1, config, 'test data')
-    predTrain = model.eval_model(x_winTrain, y_winTrain, model1, config, 'train data')
+    predTest = model.eval_model(x_winTest, y_winTest, loaded_model, config, 'test data')
+    predTrain = model.eval_model(x_winTrain, y_winTrain, loaded_model, config, 'train data')
   else:
-    predTest = model.predict_point_by_point(model1, x_winTest)
-    predTrain = model.predict_point_by_point(model1, x_winTrain)
+    predTest = model.predict_point_by_point(loaded_model, x_winTest)
+    predTrain = model.predict_point_by_point(loaded_model, x_winTrain)
     print np.column_stack((pred, y_winTest))
     
   

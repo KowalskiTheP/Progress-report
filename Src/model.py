@@ -1,5 +1,6 @@
 import time
 from keras.models import Sequential
+from keras.models import model_from_json
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.optimizers import Adam
@@ -11,6 +12,28 @@ import matplotlib.patches as mpatches
 import scipy.stats as stats
 from tabulate import tabulate
 import copy
+
+def safe_model(model, jsonFile, modelFile):
+  # serialize model to JSON
+  model_json = model.to_json()
+  with open(jsonFile, "w") as json_file:
+    json_file.write(model_json)
+  # serialize weights to HDF5
+  model.save_weights(modelFile)
+  print("Saved model to disk")
+  
+def load_model(jsonFile, modelFile):
+  # load json and create model
+  json_file = open(jsonFile, 'r')
+  loaded_model_json = json_file.read()
+  json_file.close()
+  loaded_model = model_from_json(loaded_model_json)
+  # load weights into new model
+  loaded_model.load_weights(modelFile)
+  loaded_model.compile(loss='mean_squared_error', optimizer='adam')
+  print("Loaded and compiled model from disk")
+  return loaded_model
+
 
 def build_model(params):
   '''builds model that is specified in params'''

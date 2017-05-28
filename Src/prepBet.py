@@ -1,14 +1,15 @@
 import numpy as np 
 import pandas as pd
 from datetime import datetime, timedelta
-
-
 import readConf
 import numpy as np
+import model
 
 config = readConf.readINI("../Data/config.conf")
+jsonFile = str(config['jsonfile'])
+modelFile = str(config['modelfile'])
 winLength = int(config['winlength'])
-
+date2Pred = str(config['datetopred'])
 
 def convertDate(df, dateColumn, date_format, refdate ):
   date_list = []
@@ -59,20 +60,14 @@ df_dax = convertDate(df_dax, 'Date', '%Y-%m-%d', '1985-01-01')
 df_nikkei = convertDate(df_nikkei, 'Date', '%Y-%m-%d', '1985-01-01')
 df_dowJones = convertDate(df_dowJones, 'Date', '%Y-%m-%d', '1985-01-01')
 
-print 'dax ',df_dax
-df_dax = selectRange('2017-05-12', '1985-01-01','%Y-%m-%d' , df_dax)
-print 'dax neu ', df_dax
+df_dax = selectRange(date2Pred, '1985-01-01','%Y-%m-%d' , df_dax)
 
 df_combi = pd.merge(left=df_dax, right=df_nikkei, on='days')
 df_combi = pd.merge(left=df_combi, right=df_dowJones, on='days')
-print df_combi
 
 df_dax = df_combi.loc[:,['days','Open_x','Close_x']]
 df_nikkei = df_combi.loc[:,['days','Open_y','Close_y']]
 df_dowJones = df_combi.loc[:,['days','Open','Close']]
-
-
-
 
 array_dax = reoder(df_dax, [1,2])
 
@@ -93,5 +88,28 @@ df_nikkei = df_nikkei.reset_index(drop=True)
 
 df_combi = pd.concat([df_dax, df_nikkei['stock']], axis=1, join_axes=[df_dax.index])
 df_combi = pd.concat([df_combi, df_dowJones['stock']], axis=1, join_axes=[df_combi.index])
+df_combi.drop([winLength],axis=0,inplace=True)
 
 print df_combi
+
+toPred = df_combi.as_matrix()
+multiplier = toPred[-1]
+toPred = toPred / multiplier
+toPred = toPred.reshape(1,winLength,4)
+
+#fileList = ['epochs300_tanh_100100100', 'epochs300_tanh_757575', 'epochs500_tanh_100100100', 'epochs500_tanh_757575']
+#sumPred = 0.
+#for prefix in fileList:
+  #jString = '../Data/'+prefix+'.json'
+  #hString = '../Data/'+prefix+'.h5'
+  #loaded_model = model.load_model(jString, hString)
+  #betThis = loaded_model.predict(toPred)
+  #betThis = betThis * multiplier[1]
+  #sumPred = sumPred + betThis
+  #print 'Bet this: ', betThis, ' !'
+#print 'Mean: ', sumPred/len(fileList)
+
+loaded_model = model.load_model(jsonFile, modelFile)
+betThis = loaded_model.predict(toPred)
+betThis = betThis * multiplier[1]
+print 'Bet this: ', betThis, ' !'
