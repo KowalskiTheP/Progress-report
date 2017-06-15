@@ -4,6 +4,7 @@ import loadData
 import os
 import time
 import numpy as np
+np.set_printoptions(linewidth=150)
 import sys
 
 #import matplotlib.pyplot as plt
@@ -32,8 +33,18 @@ if config['windoweddata'] == 'on':
     x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
     
   if config['normalise'] == '3':
+    #Old:
     #x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = #loadData.make_windowed_data_normOnWin(dataframe,config)
+    
+    #Working:
     x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin_DaxNikkeiDow(dataframe,config)
+    print 'x_winTrain[0]:\n', x_winTrain[0]
+    print 'y_winTrain[0]:\n', y_winTrain[0]
+    
+  if config['normalise'] == '4':
+    x_winTrain, y_winTrain, x_winTest, y_winTest,trainMax,trainMin,testMax,testMin = loadData.make_windowed_data_normOnWin_DaxNikkeiDow_new(dataframe,config)
+    print 'x_winTrain[0]:\n', x_winTrain[0]
+    print 'y_winTrain[0]:\n', y_winTrain[0]
 
 else:
   print 'not implemented so far, exiting!'
@@ -86,17 +97,25 @@ else:
     y_winTrain = loadData.denormalise_data_refValue(refValue,y_winTrain)
     predTrain = loadData.denormalise_data_refValue(refValue,predTrain)
     
-if config['normalise'] == '3':
-  y_column = int(config['y_column'])
-  y_column = int(config['y_column'])
-  for i in range(len(testRef)):
-    predTest[i] = testRef[i,y_column]*predTest[i]
-    y_winTest[i] = testRef[i,y_column]*y_winTest[i]
-  for i in range(len(trainRef)):
-    y_winTrain[i] = trainRef[i,y_column]*y_winTrain[i]
-    predTrain[i] = trainRef[i,y_column]*predTrain[i]
+  if config['normalise'] == '3':
+    y_column = int(config['y_column'])
+    for i in range(len(testRef)):
+      predTest[i] = (testRef[i,y_column]*predTest[i])
+      y_winTest[i] = (testRef[i,y_column]*y_winTest[i])
+    for i in range(len(trainRef)):
+      y_winTrain[i] = trainRef[i,y_column]*y_winTrain[i]
+      predTrain[i] = trainRef[i,y_column]*predTrain[i]
 
-    
+  if config['normalise'] == '4':
+    y_column = int(config['y_column'])
+    for i in range(len(testMax)):
+      predTest[i] = (testMax[i,y_column]*predTest[i]) + testMin[i,y_column]
+      y_winTest[i] = (testMax[i,y_column]*y_winTest[i]) + testMin[i,y_column]
+    for i in range(len(trainMax)):
+      y_winTrain[i] = trainMax[i,y_column]*y_winTrain[i] + trainMin[i,y_column]
+      predTrain[i] = trainMax[i,y_column]*predTrain[i] + trainMin[i,y_column]
+
+
 
 yDim = int(config['outputdim'])
 # If the y-dimension is bigger then one, some additional mambo jambo 
@@ -119,6 +138,8 @@ if yDim > 1:
     tmpPredTest.append(tmpY/yDim)
   predTest = np.array(tmpPredTest)
 
+print 'predTest:\n' , predTest
+print 'y_winTest:\n' , y_winTest
 
 diffTrain = np.sqrt((predTest - y_winTest)**2)
 print 'Mean of pred.-true-diff:               ', np.mean(diffTrain)
