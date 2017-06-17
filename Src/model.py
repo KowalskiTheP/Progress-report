@@ -51,9 +51,9 @@ def build_model(params):
     
     model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=7, padding='same', activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
-    model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=5, padding='same', activation='relu'))
+    model.add(Conv1D(filters=32, kernel_size=5, padding='same', activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
-    model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=3, padding='same', activation='relu'))
+    model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
   
   # first layer is special, gets build by hand
