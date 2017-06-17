@@ -169,10 +169,8 @@ def minMaxNorm(xWinTrain, yWinTrain, yColumn,yNorm=True):
       yWinTrain[j] = yWinTrain[j] - tmpMin[yColumn]
     for i in range(len(xWinTrain[0,0])):
       tmpMax.append(np.amax(xWinTrain[j,:,i]))
-    
     trainMin.append(tmpMin)
     trainMax.append(tmpMax)
-  
   return np.array(trainMin), np.array(trainMax), xWinTrain, yWinTrain
 
 ###############################################
@@ -188,47 +186,10 @@ def make_windowed_data_normOnFull(dataframe, config):
   x_winTrain_norm, y_winTrain_norm = get_windows_andShift(dataSetTrain_norm, winL, lookB)
   x_winTest_norm, y_winTest_norm = get_windows_andShift(dataSetTest_norm, winL, lookB)
   return  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm
+ 
+##############################################
 
-###############################################
-
-def make_windowed_data_normOnWin(dataframe, config):
-  print dataframe
-  refValue = float(config['refvalue'])
-  winL = int(config['winlength'])
-  lookB = int(config['look_back'])
-  xDim = len(config['columns'])
-  yDim = int(config['outputdim'])
-  #dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
-  dataSet_Full = getDataSet_noSplit_seq(dataframe, config['columns'])
-  dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
-  #x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain, winL, lookB,yDim)
-  #x_winTest, y_winTest = get_windows_andShift(dataSetTest, winL, lookB,yDim)
-  x_winTrain, y_winTrain = get_windows_andShift_seq(dataSetTrain, winL, lookB,yDim)
-  x_winTest, y_winTest = get_windows_andShift_seq(dataSetTest, winL, lookB,yDim)
-  
-  print 'x_winTrain:\n', x_winTrain
-  print 'y_winTrain:\n', y_winTrain
-  
-  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
-  for i in range(len(y_winTrain)):
-    x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
-    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,-1],y_winTrain[i]))
-    trainRef.append(x_winTrain[i,-1])
-  for i in range(len(y_winTest)):
-    x_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
-    y_winTest_norm.append(normalise_data_refValue(x_winTest[i,-1,-1],y_winTest[i]))
-    testRef.append(x_winTest[i,-1])
-    
-  x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
-  y_winTrain_norm = np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),yDim ))
-  x_winTest_norm =  np.reshape(np.array(x_winTest_norm) ,(len(x_winTest_norm) ,winL,xDim ))
-  y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,yDim ))
-  
-  return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
-
-#######################
-
-def make_windowed_data_normOnWin_DaxNikkeiDow(dataframe, config):
+def make_windowed_data_withSplit(dataframe, config):
 
   refValue = float(config['refvalue'])
   winL = int(config['winlength'])
@@ -237,34 +198,48 @@ def make_windowed_data_normOnWin_DaxNikkeiDow(dataframe, config):
   yDim = int(config['outputdim'])
   y_column = int(config['y_column'])
   dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
-  #dataSet_Full = getDataSet_noSplit_seq(dataframe, config['columns'])
+  
   dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
-  #x_winTrain, y_winTrain = get_windows_andShift(dataSetTrain, winL, lookB,yDim)
-  #x_winTest, y_winTest = get_windows_andShift(dataSetTest, winL, lookB,yDim)
   x_winTrain, y_winTrain = get_windows_andShift_seq(dataSetTrain, winL, lookB,yDim,y_column)
   x_winTest, y_winTest = get_windows_andShift_seq(dataSetTest, winL, lookB,yDim,y_column)
   
-  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
-  for i in range(len(y_winTrain)):
-    x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
-    y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,y_column],y_winTrain[i]))
-    trainRef.append(x_winTrain[i,-1])
-  for i in range(len(y_winTest)):
-    x_winTest_norm.append( normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
-    y_winTest_norm.append( normalise_data_refValue(x_winTest[i,-1,y_column],y_winTest[i]))
-    testRef.append(x_winTest[i,-1])
+  if config['normalise'] == '3':
+    x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
+    for i in range(len(y_winTrain)):
+      x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
+      y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,y_column],y_winTrain[i]))
+      trainRef.append(x_winTrain[i,-1])
+    for i in range(len(y_winTest)):
+      x_winTest_norm.append( normalise_data_refValue(x_winTest[i,-1],x_winTest[i]))
+      y_winTest_norm.append( normalise_data_refValue(x_winTest[i,-1,y_column],y_winTest[i]))
+      testRef.append(x_winTest[i,-1])
     
+  if config['normalise'] == '4':
+    trainMin,trainMax,x_winTrain,y_winTrain = minMaxNorm(x_winTrain,y_winTrain,y_column,yNorm=True)
+    testMin ,testMax ,x_winTest ,y_winTest  = minMaxNorm(x_winTest ,y_winTest ,y_column,yNorm=True)
+    x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm = [],[],[],[]
+    for i in range(len(y_winTrain)):
+      x_winTrain_norm.append( normalise_data_refValue(trainMax[i]         ,x_winTrain[i]) )
+      y_winTrain_norm.append( normalise_data_refValue(trainMax[i,y_column],y_winTrain[i]) )
+    for j in range(len(y_winTest)):
+      x_winTest_norm.append( normalise_data_refValue(testMax[j]           ,x_winTest[j])  )
+      y_winTest_norm.append( normalise_data_refValue(testMax[j,y_column]  ,y_winTest[j])  )
+  
   x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
   y_winTrain_norm = np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),yDim ))
   x_winTest_norm =  np.reshape(np.array(x_winTest_norm) ,(len(x_winTest_norm) ,winL,xDim ))
   y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,yDim ))
   
-  return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
+  if config['normalise'] == '3':
+    return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
+  
+  if config['normalise'] == '4':
+    return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainMax),np.array(trainMin),np.array(testMax),np.array(testMin)  
   
 ##############################################
-
-def make_windowed_data_normOnWin_DaxNikkeiDow_new(dataframe, config):
-
+  
+def make_windowed_data_noSplit(dataframe, config):
+  
   refValue = float(config['refvalue'])
   winL = int(config['winlength'])
   lookB = int(config['look_back'])
@@ -273,55 +248,41 @@ def make_windowed_data_normOnWin_DaxNikkeiDow_new(dataframe, config):
   y_column = int(config['y_column'])
   dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
   
-  if str(config['traintestsplit']) == 'True':
-    dataSetTrain, dataSetTest = split_data(dataSet_Full, float(config['traintestsplit']))
-  else:
-    x_winTrain, y_winTrain = get_windows_andShift_seq(dataSet_Full, winL, lookB,yDim,y_column)
+  x_winTrain, y_winTrain = get_windows_andShift_seq(dataSet_Full, winL, lookB,yDim,y_column)
+  
+  if config['normalise'] == '3':
+    x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]
+    for i in range(len(y_winTrain)):
+      x_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1],x_winTrain[i]))
+      y_winTrain_norm.append(normalise_data_refValue(x_winTrain[i,-1,y_column],y_winTrain[i]))
+      trainRef.append(x_winTrain[i,-1])       
+    for i in range(len(x_winTrain)-100,len(x_winTrain),1):
+      x_winTest_norm.append(x_winTrain_norm.pop(-1))
+      y_winTest_norm.append(y_winTrain_norm.pop(-1))
+      testRef.append(trainRef.pop(-1))
 
-  trainMin,trainMax,x_winTrain,y_winTrain = minMaxNorm(x_winTrain,y_winTrain,y_column,yNorm=True)
-    
-  x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,testMax,testMin = [],[],[],[],[],[]
-  for i in range(len(y_winTrain)):
-    x_winTrain_norm.append( normalise_data_refValue(trainMax[i]         ,x_winTrain[i]) )
-    y_winTrain_norm.append( normalise_data_refValue(trainMax[i,y_column],y_winTrain[i]) )
-    x_winTrain_norm[i] = x_winTrain_norm[i].tolist()
-
-#Just for testing if a prior classification would be helpfull
-    #for j in range( len(x_winTrain_norm[i])-1 ):
-      #if x_winTrain_norm[i][j][y_column] < x_winTrain_norm[i][j+1][y_column]:
-        #x_winTrain_norm[i][j].append(1)
-      #else:
-        #x_winTrain_norm[i][j].append(0)
-###        
-    #if x_winTrain_norm[i][winL-1][y_column] < y_winTrain_norm[i]:
-        #x_winTrain_norm[i][winL-1] = np.append(x_winTrain_norm[i][winL-1],1)
-    #else:
-        #x_winTrain_norm[i][winL-1] = np.append(x_winTrain_norm[i][winL-1],0)
-
-  trainMin = trainMin.tolist()
-  trainMax = trainMax.tolist()
-
-  for i in range(len(x_winTrain)-100,len(x_winTrain),1):
-    x_winTest_norm.append(x_winTrain_norm.pop(-1))
-    y_winTest_norm.append(y_winTrain_norm.pop(-1))
-    testMin.append(trainMin.pop(-1))
-    testMax.append(trainMax.pop(-1))
-
-  if str(config['traintestsplit']) == 'True':
-    for i in range(len(y_winTest)):
-      x_winTest_norm.append( normalise_data_refValue(maxValues[i],x_winTest[i]))
-      y_winTest_norm.append( normalise_data_refValue(maxValues[i,y_column],y_winTest[i]))
-      testRef.append(x_winTest[i,-1])   
-
-
-  print np.array(x_winTrain_norm).shape
-
+  if config['normalise'] == '4':
+    trainMin,trainMax,x_winTrain,y_winTrain = minMaxNorm(x_winTrain,y_winTrain,y_column,yNorm=True)
+    x_winTrain_norm, y_winTrain_norm = [],[]
+    for i in range(len(y_winTrain)):
+      x_winTrain_norm.append( normalise_data_refValue(trainMax[i]         ,x_winTrain[i]) )
+      y_winTrain_norm.append( normalise_data_refValue(trainMax[i,y_column],y_winTrain[i]) )
+    trainMin = trainMin.tolist()
+    trainMax = trainMax.tolist()
+    x_winTest_norm, y_winTest_norm,testMax,testMin = [],[],[],[]
+    for i in range(len(x_winTrain)-100,len(x_winTrain),1):
+      x_winTest_norm.append(x_winTrain_norm.pop(-1))
+      y_winTest_norm.append(y_winTrain_norm.pop(-1))
+      testMin.append(trainMin.pop(-1))
+      testMax.append(trainMax.pop(-1))
+  
   x_winTrain_norm = np.reshape(np.array(x_winTrain_norm),(len(x_winTrain_norm),winL,xDim ))
   y_winTrain_norm = np.reshape(np.array(y_winTrain_norm),(len(y_winTrain_norm),yDim ))
   x_winTest_norm =  np.reshape(np.array(x_winTest_norm) ,(len(x_winTest_norm) ,winL,xDim ))
   y_winTest_norm =  np.reshape(np.array(y_winTest_norm) ,(len(y_winTest_norm) ,yDim ))
   
-  return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainMax),np.array(trainMin),np.array(testMax),np.array(testMin)
-
-
-
+  if config['normalise'] == '3':
+    return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainRef), np.array(testRef)
+  
+  if config['normalise'] == '4':
+    return x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm, np.array(trainMax),np.array(trainMin),np.array(testMax),np.array(testMin)  

@@ -32,19 +32,17 @@ if config['windoweddata'] == 'on':
     refValue = float(config['refvalue'])
     x_winTrain, y_winTrain, x_winTest, y_winTest = loadData.make_windowed_data_normOnFull(dataframe, config) 
     
-  if config['normalise'] == '3':
-    #Old:
-    #x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = #loadData.make_windowed_data_normOnWin(dataframe,config)
-    
-    #Working:
-    x_winTrain, y_winTrain, x_winTest, y_winTest, trainRef, testRef = loadData.make_windowed_data_normOnWin_DaxNikkeiDow(dataframe,config)
-    print 'x_winTrain[0]:\n', x_winTrain[0]
-    print 'y_winTrain[0]:\n', y_winTrain[0]
-    
-  if config['normalise'] == '4':
-    x_winTrain, y_winTrain, x_winTest, y_winTest,trainMax,trainMin,testMax,testMin = loadData.make_windowed_data_normOnWin_DaxNikkeiDow_new(dataframe,config)
-    print 'x_winTrain[0]:\n', x_winTrain[0]
-    print 'y_winTrain[0]:\n', y_winTrain[0]
+  if config['split'] == 'on':
+    if config['normalise'] == '3':   
+      x_winTrain, y_winTrain, x_winTest, y_winTest,trainRef, testRef = loadData.make_windowed_data_withSplit(dataframe,config)
+    if config['normalise'] == '4':
+      x_winTrain, y_winTrain, x_winTest, y_winTest,trainMax,trainMin,testMax,testMin = loadData.make_windowed_data_withSplit(dataframe,config)    
+
+  if config['split'] == 'off':
+    if config['normalise'] == '3':   
+      x_winTrain, y_winTrain, x_winTest, y_winTest,trainRef, testRef = loadData.make_windowed_data_noSplit(dataframe,config)
+    if config['normalise'] == '4':
+      x_winTrain, y_winTrain, x_winTest, y_winTest,trainMax,trainMin,testMax,testMin = loadData.make_windowed_data_noSplit(dataframe,config) 
 
 else:
   print 'not implemented so far, exiting!'
