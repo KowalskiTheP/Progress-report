@@ -151,7 +151,7 @@ def get_windows_andShift_seq(x,winLength,look_back,outDim,y_column):
   x_train, y_train = [], []
   #Porbably important bugfix
   #Old: for i in xrange(0,len(x)-(winLength+outDim),2): 
-  for i in xrange(0,len(x)-(winLength+outDim),1):
+  for i in xrange(0,len(x)-(winLength+outDim),2):
     x_train.append(x[i:i+winLength])
     y_train.append(x[(i+winLength+look_back-1):(i+winLength+look_back+outDim-1),y_column])
   return np.array(x_train), np.reshape(np.array(y_train),(len(y_train),outDim))
@@ -249,6 +249,10 @@ def make_windowed_data_noSplit(dataframe, config):
   dataSet_Full = getDataSet_noSplit(dataframe, config['columns'])
   
   x_winTrain, y_winTrain = get_windows_andShift_seq(dataSet_Full, winL, lookB,yDim,y_column)
+  
+  print x_winTrain[1000], y_winTrain[1000]
+  print x_winTrain[1001], y_winTrain[1001]
+  print x_winTrain[1002], y_winTrain[1002]
   
   if config['normalise'] == '3':
     x_winTrain_norm, y_winTrain_norm, x_winTest_norm, y_winTest_norm,trainRef,testRef = [],[],[],[],[],[]

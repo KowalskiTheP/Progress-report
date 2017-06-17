@@ -44,9 +44,16 @@ if config['windoweddata'] == 'on':
     if config['normalise'] == '4':
       x_winTrain, y_winTrain, x_winTest, y_winTest,trainMax,trainMin,testMax,testMin = loadData.make_windowed_data_noSplit(dataframe,config) 
 
+
+
 else:
   print 'not implemented so far, exiting!'
   sys.exit()
+  
+#x_winTrain = x_winTrain[7000:-1]
+#y_winTrain = y_winTrain[7000:-1]
+#trainMax = trainMax[7000:-1]
+#trainMin = trainMin[7000:-1]
 
 print '> Data loaded! This took: ', time.time() - loadData_start_time, 'seconds'
 
@@ -146,7 +153,7 @@ print 'Standard deviation of pred.-true-diff: ', np.std(diffTrain)
 if config['plotting'] == 'on':
   model.plot_data(y_winTrain, predTrain)
   model.plot_data(y_winTest, predTest)
-  model.plot_data(y_winTest[-100:-1], predTest[-100:-1])
+  model.plot_data(y_winTest[-50:-1], predTest[-50:-1])
  
 
 
