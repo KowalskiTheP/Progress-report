@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 from datetime import datetime
 
 def convertDate(df, dateColumn, date_format, refdate ):
@@ -24,54 +25,73 @@ def reoder(dataframe, columns):
     j=j+1
   return dataSet
 
-df_dax = pd.read_csv('../Data/dax_19700105_20170428.csv', decimal=',' ,sep=';', header=0)
-df_dax = df_dax.drop(df_dax.index[range(0,3740)])
+def addInfo(dataframe, orderedArray, finalWidth, columns2Add):
+  dax_newArray = np.zeros((len(orderedArray),finalWidth))
+  for i in range(0,len(orderedArray),2):
+    if orderedArray[i,1] >= orderedArray[i-1,1]:
+      tmp_array = np.array([ orderedArray[i,1], orderedArray[i-1,1] ])
+    else:
+      tmp_array = np.array([ orderedArray[i-1,1], orderedArray[i,1] ])
+    dax_newArray[i]   = np.concatenate((orderedArray[i], tmp_array), axis=0)
+    tmp_array_p1 = np.array(dataframe.iloc[(i/2),columns2Add])
+    dax_newArray[i+1] = np.concatenate((orderedArray[i+1], tmp_array_p1), axis=0)
+  return dax_newArray
+
+#df_dax = pd.read_csv('../Data/dax_19700105_20170428.csv', decimal=',' ,sep=';', header=0)
+df_dax = pd.read_csv('../Data/dax_26111990_06062017.csv', decimal='.' ,sep=',', header=0)
+df_dax = df_dax[df_dax.High != 'null']
 df_dax = df_dax.reset_index(drop=True)
+
 
 df_nikkei = pd.read_csv('../Data/Nikkei_02051985_02052017.csv', decimal='.' ,sep=',', header=0)
 df_dowJones = pd.read_csv('../Data/DowJones_02051985_02052017.csv', decimal='.' ,sep=',', header=0)
 
+#Fuer High low data
+df_dax.drop('Adj Close', axis=1,inplace=True)
+df_nikkei.drop('Adj Close', axis=1,inplace=True)
+df_dowJones.drop('Adj Close', axis=1,inplace=True)
 
-df_dax.drop(['Hoch','Tief','Performance','Volumen','Abstand Hoch/Tief'], axis=1,inplace=True)
-df_nikkei.drop(['High','Low','Volume','Adj Close'], axis=1,inplace=True)
-df_dowJones.drop(['High','Low','Volume','Adj Close'], axis=1,inplace=True)
-
-df_dax = convertDate(df_dax, 'Datum', '%d.%m.%Y', '01.01.1985')
+df_dax = convertDate(df_dax, 'Date', '%Y-%m-%d', '1985-01-01')
 df_nikkei = convertDate(df_nikkei, 'Date', '%Y-%m-%d', '1985-01-01')
 df_dowJones = convertDate(df_dowJones, 'Date', '%Y-%m-%d', '1985-01-01')
 
 df_combi = pd.merge(left=df_dax, right=df_nikkei, on='days')
 df_combi = pd.merge(left=df_combi, right=df_dowJones, on='days')
 
-df_dax = df_combi.loc[:,['days','Eroeffnung','Schluss']]
-df_nikkei = df_combi.loc[:,['days','Open_x','Close_x']]
-df_dowJones = df_combi.loc[:,['days','Open_y','Close_y']]
+df_dax = df_combi.loc[:,['days','Open_x','High_x','Low_x','Close_x']]
+df_nikkei = df_combi.loc[:,['days','Open_y','High_y','Low_y','Close_y']]
+df_dowJones = df_combi.loc[:,['days','Open','High','Low','Close']]
 
-array_dax = reoder(df_dax, [1,2])
-array_nikkei = reoder(df_nikkei, [1,2])
-array_dowJones = reoder(df_dowJones, [1,2])
+array_dax = reoder(df_dax, [1,4])
+array_nikkei = reoder(df_nikkei, [1,4])
+array_dowJones = reoder(df_dowJones, [1,4])
 
+dax_newArray = addInfo(df_dax, array_dax, 4, [2,3])
+nikkei_newArray = addInfo(df_nikkei, array_nikkei, 4, [2,3])
+dowJones_newArray = addInfo(df_dowJones, array_dowJones, 4, [2,3])
+
+array_dax = dax_newArray
+array_nikkei = nikkei_newArray
+array_dowJones = dowJones_newArray
 
 for i in range(len(array_dax)):
   if array_dax[i,0]!=array_nikkei[i,0] or array_dax[i,0]!=array_dowJones[i,0] or array_dowJones[i,0]!=array_nikkei[i,0]:
     print 'Problem!!! Arrays are not in sync!'    
 
+df_dax = pd.DataFrame(data=array_dax, columns=['days','stock','high','low'])
+df_nikkei = pd.DataFrame(data=array_nikkei, columns=['days','stock','high','low'])
+df_dowJones = pd.DataFrame(data=array_dowJones, columns=['days','stock','high','low'])
 
-df_dax = pd.DataFrame(data=array_dax, columns=['days','stock'])
-df_nikkei = pd.DataFrame(data=array_nikkei, columns=['days','stock'])
-df_dowJones = pd.DataFrame(data=array_dowJones, columns=['days','stock'])
+#df_nikkei = df_nikkei.drop(df_nikkei.index[[0]])
+#df_nikkei = df_nikkei.reset_index(drop=True)
+#print 'df_nikkei:\n', df_nikkei.shift(periods=1, freq=None, axis=0)
 
-df_nikkei = df_nikkei.drop(df_nikkei.index[[0]])
-df_nikkei = df_nikkei.reset_index(drop=True)
-print 'df_nikkei:\n', df_nikkei.shift(periods=1, freq=None, axis=0)
+df_combi = pd.concat([df_dax, df_nikkei[['stock','high','low']] ], axis=1, join_axes=[df_dax.index])
+df_combi = pd.concat([df_combi, df_dowJones[['stock','high','low']] ], axis=1, join_axes=[df_combi.index])
 
-df_combi = pd.concat([df_dax, df_nikkei['stock']], axis=1, join_axes=[df_dax.index])
-df_combi = pd.concat([df_combi, df_dowJones['stock']], axis=1, join_axes=[df_combi.index])
+df_combi = df_combi.drop(df_combi.index[[12376,12377]])
 
-df_combi = df_combi.drop(df_combi.index[[14988,14989]])
-
-df_combi.to_csv('../Data/combi_dax_nikkei_dowJones.csv',index=False)
-print df_combi
+df_combi.to_csv('../Data/combi_dax_nikkei_dowJones_HLV.csv',index=False)
 
 
 
