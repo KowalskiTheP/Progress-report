@@ -5,6 +5,8 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.optimizers import Adam
 from keras.layers import Dropout
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
 from keras.layers.normalization import BatchNormalization
 import numpy as np
 import matplotlib.pyplot as plt
@@ -45,6 +47,15 @@ def build_model(params):
   model = Sequential()
   #print len(params['neuronsperlayer'])
   #print params['neuronsperlayer']
+  if params['cnn'] == 'on':
+    
+    model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=7, padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=5, padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(input_shape = (None, int(params['inputdim'])), filters=32, kernel_size=3, padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+  
   # first layer is special, gets build by hand
   if isinstance(params['neuronsperlayer'], list):
       
@@ -55,13 +66,15 @@ def build_model(params):
       input_shape = (None, int(params['inputdim'])),
       activation = str(params['activationperlayer'][0]),
       return_sequences=True,
-      recurrent_activation = str(params['recurrentactivation'][0])
+      recurrent_activation = str(params['recurrentactivation'][0]),
+      dropout=float(params['dropout'][0]),
+      recurrent_dropout=float(params['dropout'][0])
       )
     )
     if str(params['batchnorm']) == 'on':
       model.add(BatchNormalization())
     
-    model.add(Dropout(float(params['dropout'][0])))
+    #model.add(Dropout(float(params['dropout'][0])))
   
     # all interims layer get done by this for loop
     for i in xrange(1,len(params['neuronsperlayer'])-1):
@@ -72,7 +85,9 @@ def build_model(params):
         int(params['neuronsperlayer'][i]),
         activation = str(params['activationperlayer'][i]),
         return_sequences=True,
-        recurrent_activation = str(params['recurrentactivation'][i])
+        recurrent_activation = str(params['recurrentactivation'][i]),
+        dropout=float(params['dropout'][i]),
+        recurrent_dropout=float(params['dropout'][i])
         )
       )
       if str(params['batchnorm']) == 'on':
